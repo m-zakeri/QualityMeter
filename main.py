@@ -1,11 +1,11 @@
 import argparse
-from utils.file_reader import FileReader
+from qualitymeter.qmood.extendibility import Extendability
 
 
 def main():
-    path = 'test/client'
-    for stream in FileReader.getFileStreams(path):
-        pass
+    extendabilityMeter = Extendability('test/client')
+    print("---Extendability Report---")
+
 
 if __name__ == "__main__":
     main()

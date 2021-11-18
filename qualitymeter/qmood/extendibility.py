@@ -2,5 +2,22 @@
 
 
 """
+from metrics.polymorphism import Polymorphism
 
-# Todo: implement the extendability module
+class Extendability:
+    def __init__(self, projectPath):
+        self.projectPath = projectPath
+        self.calcPolymorphism()
+
+    def calcAbstraction(self):
+        pass
+
+    def calcCoupling(self):
+        pass
+
+    def calcInheritance(self):
+        pass
+
+    def calcPolymorphism(self):
+        polymorphismMeter = Polymorphism(self.projectPath)
+        # get value from polymorphismMeter and return it.
