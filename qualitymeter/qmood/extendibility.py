@@ -2,7 +2,7 @@
 
 
 """
-from metrics.polymorphism import Polymorphism
+from .metrics.polymorphism import Polymorphism
 
 class Extendability:
     def __init__(self, projectPath):

@@ -3,7 +3,8 @@ from qualitymeter.qmood.extendibility import Extendability
 
 
 def main():
-    extendabilityMeter = Extendability('test/client')
+    path = 'test/geometry'
+    extendabilityMeter = Extendability(path)
     print("---Extendability Report---")
 
 
