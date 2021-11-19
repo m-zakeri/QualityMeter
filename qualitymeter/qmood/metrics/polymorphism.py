@@ -37,8 +37,7 @@ class Polymorphism:
 
             for builtInParent in javaBuiltInParents:
                     # We exclude inheriting Java built-in classes.
-                    javaClass.removeParent(parentName)
-            print("removed classes: ", javaBuiltInParents)
+                    javaClass.removeParent(builtInParent)
 
 
     def calcPolymorphism(self):
@@ -55,9 +54,6 @@ class Polymorphism:
 
             for method in javaClass.methodList():
                 for parentClass in javaClass.parentObjectList():
-                    if parentClass is None: #This should not happend
-                        print(" parent is None")
-                        continue
                     if parentClass.hasMethod(method):
                         countOverLoaded += 1
                         countMethods += 1
