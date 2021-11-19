@@ -6,6 +6,10 @@ class JavaMethod:
         self.parameterList = []
 
 
+    def getNumOfParameters(self):
+        return len(self.parameterList)
+
+
     def setParameterList(self, parameterList):
         if not parameterList:
             return
@@ -13,7 +17,6 @@ class JavaMethod:
         formalParameters = parameterList.formalParameter()
         for parameter in formalParameters:
             if parameter.typeType().classOrInterfaceType():
-                # TODO: parse class Parameters
                 for classOrInterface in parameter.typeType().classOrInterfaceType().IDENTIFIER():
                     self.parameterList.append(classOrInterface.getText())
             if parameter.typeType().primitiveType():
@@ -38,3 +41,16 @@ class JavaMethod:
             return primitive.FLOAT().getText()
         if primitive.DOUBLE():
             return primitive.DOUBLE().getText()
+
+
+    # if two function signatures are equal, __eq__ returns true
+    def __eq__(self, other):
+        if other.methodName != self.methodName:
+            return False
+        if other.getNumOfParameters() != other.getNumOfParameters():
+            return False
+
+        for parameter in zip(self.parameterList, other.parameterList):
+            if parameter[0] != parameter[1]:
+                return False
+        return True

@@ -3,14 +3,15 @@ from utils.file_reader import FileReader
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from .polymorphismListener import PolymorphismListener
+from .javaClassContainer import JavaCLassContainer
 
 class Polymorphism:
     def __init__(self, projectPath):
         self.projectPath = projectPath
-        for stream in FileReader.getFileStreams(projectPath):
-            self.calcPolymorphim(stream)
+        self.javaClassContainer = JavaCLassContainer()
 
-    def calcPolymorphim(self, stream):
+
+    def getJavaClasses(self, stream):
         lexer = JavaLexer(stream)
         tokenStream = CommonTokenStream(lexer)
         parser = JavaParserLabeled(tokenStream)
@@ -21,8 +22,44 @@ class Polymorphism:
         walker = ParseTreeWalker()
         walker.walk(t=parseTree, listener=listener)
         javaClassList = listener.getClassList()
-        # for javaClass in javaClassList:
-        #     print(javaClass.className)
-        #     for javaMethod in javaClass.methodList:
-        #         print(javaMethod.methodName, javaMethod.parameterList)
-        #     print("---------------------------")
+        for javaClass in javaClassList:
+            self.javaClassContainer.addJavaClass(javaClass)
+
+
+    def setClassParents(self):
+        for javaClass in self.javaClassContainer.javaClassList():
+            javaBuiltInParents = []
+            for parentName in javaClass.parentNameList():
+                if self.javaClassContainer.getJavaClass(parentName):
+                    javaClass.addParent(parentName, self.javaClassContainer.getJavaClass(parentName))
+                else:
+                    javaBuiltInParents.append(parentName)
+
+            for builtInParent in javaBuiltInParents:
+                    # We exclude inheriting Java built-in classes.
+                    javaClass.removeParent(parentName)
+            print("removed classes: ", javaBuiltInParents)
+
+
+    def calcPolymorphism(self):
+        for stream in FileReader.getFileStreams(self.projectPath):
+            self.getJavaClasses(stream)
+        self.setClassParents()
+
+        countMethods = 0
+        countOverLoaded = 0
+        for javaClass in self.javaClassContainer.javaClassList():
+            if not javaClass.parentList:
+                countMethods += javaClass.getNumMethods()
+                continue
+
+            for method in javaClass.methodList():
+                for parentClass in javaClass.parentObjectList():
+                    if parentClass is None: #This should not happend
+                        print(" parent is None")
+                        continue
+                    if parentClass.hasMethod(method):
+                        countOverLoaded += 1
+                        countMethods += 1
+
+        print("total number of methods = ", countMethods, "number of overloaded methods = ", countOverLoaded)

@@ -20,4 +20,5 @@ class Extendability:
 
     def calcPolymorphism(self):
         polymorphismMeter = Polymorphism(self.projectPath)
+        return polymorphismMeter.calcPolymorphism()
         # get value from polymorphismMeter and return it.
