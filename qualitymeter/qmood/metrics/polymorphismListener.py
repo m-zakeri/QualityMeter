@@ -1,6 +1,7 @@
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import *
 from .javaClass import JavaClass
+from .javaMethod import JavaMethod
 
 class PolymorphismListener(JavaParserLabeledListener):
     def __init__(self):
@@ -8,7 +9,6 @@ class PolymorphismListener(JavaParserLabeledListener):
         self.currentJavaClass = None
 
 
-    @property
     def getClassList(self):
         return self.javaClassList
 
@@ -26,4 +26,7 @@ class PolymorphismListener(JavaParserLabeledListener):
 
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
-        pass
+        javaMethod = JavaMethod(ctx.IDENTIFIER().getText())
+        print(javaMethod.methodName)
+        javaMethod.setParameterList(ctx.formalParameters().formalParameterList())
+        print("-----------------")

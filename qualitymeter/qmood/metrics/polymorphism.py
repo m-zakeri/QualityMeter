@@ -20,3 +20,5 @@ class Polymorphism:
         listener =PolymorphismListener()
         walker = ParseTreeWalker()
         walker.walk(t=parseTree, listener=listener)
+        javaClassList = listener.getClassList()
+
