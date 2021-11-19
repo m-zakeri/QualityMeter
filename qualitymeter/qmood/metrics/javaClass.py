@@ -9,8 +9,8 @@ class JavaClass:
         self.className = clsName
 
 
-    def addMethod(self, methodName):
-        self.methodList.append(methodName)
+    def addMethod(self, method):
+        self.methodList.append(method)
 
 
     def addParent(self, parent):

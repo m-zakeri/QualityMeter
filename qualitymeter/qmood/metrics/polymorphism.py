@@ -21,4 +21,8 @@ class Polymorphism:
         walker = ParseTreeWalker()
         walker.walk(t=parseTree, listener=listener)
         javaClassList = listener.getClassList()
-
+        # for javaClass in javaClassList:
+        #     print(javaClass.className)
+        #     for javaMethod in javaClass.methodList:
+        #         print(javaMethod.methodName, javaMethod.parameterList)
+        #     print("---------------------------")

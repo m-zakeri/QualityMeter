@@ -28,3 +28,4 @@ class PolymorphismListener(JavaParserLabeledListener):
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         javaMethod = JavaMethod(ctx.IDENTIFIER().getText())
         javaMethod.setParameterList(ctx.formalParameters().formalParameterList())
+        self.currentJavaClass.addMethod(javaMethod)
