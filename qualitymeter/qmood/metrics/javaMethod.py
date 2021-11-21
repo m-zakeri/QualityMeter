@@ -14,14 +14,22 @@ class JavaMethod:
         if not parameterList:
             return
 
-        formalParameters = parameterList.formalParameter()
-        for parameter in formalParameters:
-            if parameter.typeType().classOrInterfaceType():
-                for classOrInterface in parameter.typeType().classOrInterfaceType().IDENTIFIER():
-                    self.parameterList.append(classOrInterface.getText())
-            if parameter.typeType().primitiveType():
-                primitive = parameter.typeType().primitiveType()
-                self.parameterList.append(self.getPrimitiveType(primitive))
+        try:
+            formalParameters = parameterList.formalParameter()
+            for parameter in formalParameters:
+                self.parameterList.append(self.getTypeOfParameter(parameter))
+        except AttributeError:
+            parameter = parameterList.lastFormalParameter()
+            self.parameterList.append(self.getTypeOfParameter(parameter))
+
+
+    def getTypeOfParameter(self, parameter):
+        if parameter.typeType().classOrInterfaceType():
+            for classOrInterface in parameter.typeType().classOrInterfaceType().IDENTIFIER():
+                return classOrInterface.getText()
+        if parameter.typeType().primitiveType():
+            primitive = parameter.typeType().primitiveType()
+            return self.getPrimitiveType(primitive)
 
 
     def getPrimitiveType(self, primitive):

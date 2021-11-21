@@ -8,7 +8,11 @@ class FileReader:
 
     @classmethod
     def getFileStream(cls, file):
-        return FileStream(file, encoding='utf-8')
+        try:
+            stream = FileStream(file, encoding='utf-8')
+        except UnicodeDecodeError:
+            stream = FileStream(file, encoding='latin-1')
+        return stream
 
     @classmethod
     def getFileStreams(cls, path):
