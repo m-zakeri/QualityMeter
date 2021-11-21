@@ -32,6 +32,10 @@ class PolymorphismListener(JavaParserLabeledListener):
 
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        # a method may be out of a class, in an enum for example. we only care about methods inside a class.
+        if not self.currentJavaClass:
+            return
+
         javaMethod = JavaMethod(ctx.IDENTIFIER().getText())
         javaMethod.setParameterList(ctx.formalParameters().formalParameterList())
         self.currentJavaClass.addMethod(javaMethod)
