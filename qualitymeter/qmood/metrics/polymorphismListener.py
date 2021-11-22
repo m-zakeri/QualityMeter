@@ -27,6 +27,13 @@ class PolymorphismListener(JavaParserLabeledListener):
         if ctx.EXTENDS():
             for parent in ctx.typeType().classOrInterfaceType().IDENTIFIER():
                 self.currentClass.addParent(parent.getText())
+
+        if ctx.IMPLEMENTS():
+            for interface in ctx.typeList().typeType():
+                for token in interface.classOrInterfaceType().IDENTIFIER():
+                    self.currentClass.addInterface(token.getText())
+
+
         self.classList.append(self.currentClass)
         self.classStack.append(self.currentClass)
 
