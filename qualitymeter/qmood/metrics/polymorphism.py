@@ -98,7 +98,6 @@ class Polymorphism:
                             break
 
                 if found:
-                    print(method.methodName)
                     countOverLoaded += 1
 
-        print("total number of methods = ", countMethods, "number of overloaded methods = ", countOverLoaded)
+        return countOverLoaded
