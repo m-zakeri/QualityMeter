@@ -17,3 +17,16 @@ class JavaInterface:
     def parentNameList(self):
         for parentName in self.parentList:
             yield parentName
+
+    def hasMethod(self, foreignMethod):
+        for method in self.methods:
+            if method == foreignMethod:
+                return True
+        for parent in self.parentNameList():
+            if self.parentList[parent] is None:
+                raise ValueError(f"Parent {parent} of Class {self.interfaceName} is not Available")
+            else:
+                result = self.parentList[parent].hasMethod(foreignMethod)
+                if result:
+                    return True
+        return False

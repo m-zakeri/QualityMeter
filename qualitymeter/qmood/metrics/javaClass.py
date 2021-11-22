@@ -37,21 +37,26 @@ class JavaClass:
     def getNumMethods(self):
         return len(self.methods)
 
-    def hasMethod(self, foreinMethod):
+    def hasMethod(self, foreignMethod):
         for method in self.methods:
-            if method == foreinMethod:
+            if method == foreignMethod:
                 return True
 
-        if not self.parentClassList:
-            return False
-        else:
-            for parent in self.parentNameList():
-                if self.parentClassList[parent] is None:
-                    raise ValueError(f"Parent {parent} of Class {self.className} is not Available")
-                else:
-                    result = self.parentClassList[parent].hasMethod(foreinMethod)
-                    if result:
-                        return True
+        for parent in self.parentNameList():
+            if self.parentClassList[parent] is None:
+                raise ValueError(f"Parent {parent} of Class {self.className} is not Available")
+            else:
+                result = self.parentClassList[parent].hasMethod(foreignMethod)
+                if result:
+                    return True
+
+        for interface in self.interfaceNameList():
+            if self.interfaceList[interface] is None:
+                raise ValueError(f"Parent {interface} of Class {self.className} is not Available")
+            else:
+                result = self.interfaceList[interface].hasMethod(foreignMethod)
+                if result:
+                    return True
         return False
 
     def parentNameList(self):

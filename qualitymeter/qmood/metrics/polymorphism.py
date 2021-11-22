@@ -82,14 +82,23 @@ class Polymorphism:
         countMethods = 0
         countOverLoaded = 0
         for javaClass in self.javaClassContainer.javaClassList():
-            if not javaClass.hasParent():
-                countMethods += javaClass.getNumMethods()
-                continue
+            countMethods += javaClass.getNumMethods()
 
             for method in javaClass.methodList():
-                for parentClass in javaClass.parentObjectList():
-                    if parentClass.hasMethod(method):
-                        countOverLoaded += 1
-                        countMethods += 1
+                found = False
+                for interface in javaClass.interfaceObjectList():
+                    if interface.hasMethod(method):
+                        found = True
+                        break
+
+                if not found:
+                    for parentClass in javaClass.parentObjectList():
+                        if parentClass.hasMethod(method):
+                            found = True
+                            break
+
+                if found:
+                    print(method.methodName)
+                    countOverLoaded += 1
 
         print("total number of methods = ", countMethods, "number of overloaded methods = ", countOverLoaded)
