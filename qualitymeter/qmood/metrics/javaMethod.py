@@ -5,10 +5,8 @@ class JavaMethod:
         self.methodName = methodName
         self.parameterList = []
 
-
     def getNumOfParameters(self):
         return len(self.parameterList)
-
 
     def setParameterList(self, parameterList):
         if not parameterList:
@@ -22,7 +20,6 @@ class JavaMethod:
             parameter = parameterList.lastFormalParameter()
             self.parameterList.append(self.getTypeOfParameter(parameter))
 
-
     def getTypeOfParameter(self, parameter):
         if parameter.typeType().classOrInterfaceType():
             for classOrInterface in parameter.typeType().classOrInterfaceType().IDENTIFIER():
@@ -30,7 +27,6 @@ class JavaMethod:
         if parameter.typeType().primitiveType():
             primitive = parameter.typeType().primitiveType()
             return self.getPrimitiveType(primitive)
-
 
     def getPrimitiveType(self, primitive):
         if primitive.BOOLEAN():
@@ -49,7 +45,6 @@ class JavaMethod:
             return primitive.FLOAT().getText()
         if primitive.DOUBLE():
             return primitive.DOUBLE().getText()
-
 
     # if two function signatures are equal, __eq__ returns true
     def __eq__(self, other):

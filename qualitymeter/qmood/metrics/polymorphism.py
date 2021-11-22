@@ -10,7 +10,6 @@ class Polymorphism:
         self.projectPath = projectPath
         self.javaClassContainer = JavaCLassContainer()
 
-
     def getJavaClasses(self, stream):
         lexer = JavaLexer(stream)
         tokenStream = CommonTokenStream(lexer)
@@ -22,9 +21,9 @@ class Polymorphism:
         walker = ParseTreeWalker()
         walker.walk(t=parseTree, listener=listener)
         javaClassList = listener.getClassList()
+        javaInterfaceList = listener.getInterfaceList()
         for javaClass in javaClassList:
             self.javaClassContainer.addJavaClass(javaClass)
-
 
     def setClassParents(self):
         for javaClass in self.javaClassContainer.javaClassList():
@@ -36,14 +35,17 @@ class Polymorphism:
                     javaBuiltInParents.append(parentName)
 
             for builtInParent in javaBuiltInParents:
-                    # We exclude inheriting Java built-in classes.
-                    javaClass.removeParent(builtInParent)
+                # We exclude inheriting Java built-in classes.
+                javaClass.removeParent(builtInParent)
 
+    def setInterfaceParents(self):
+        pass
 
     def calcPolymorphism(self):
         for stream in FileReader.getFileStreams(self.projectPath):
             self.getJavaClasses(stream)
         self.setClassParents()
+        self.setInterfaceParents()
 
         countMethods = 0
         countOverLoaded = 0

@@ -4,30 +4,23 @@ class JavaClass:
         self.methods = []
         self.parentList = {}
 
-
     def setClassName(self, clsName):
         self.className = clsName
-
 
     def addMethod(self, method):
         self.methods.append(method)
 
-
     def addParent(self, parentName, parentObject=None):
         self.parentList[parentName] = parentObject
-
 
     def removeParent(self, parentName):
         self.parentList.pop(parentName, None)
 
-
     def getParent(self, parentName):
         return self.parentList.get(parentName)
 
-
     def getNumMethods(self):
         return len(self.methods)
-
 
     def hasMethod(self, foreinMethod):
         for method in self.methods:
@@ -46,7 +39,6 @@ class JavaClass:
                         return True
         return False
 
-
     def parentNameList(self):
         for parentName in self.parentList:
             yield parentName
@@ -54,7 +46,6 @@ class JavaClass:
     def parentObjectList(self):
         for parentName in self.parentList:
             yield self.parentList[parentName]
-
 
     def methodList(self):
         for method in self.methods:
