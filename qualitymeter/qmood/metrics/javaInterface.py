@@ -1,3 +1,10 @@
+"""
+class JavaInterface:
+- contains the information about a java interface. this information
+  includes the interface name, the interfaces it extends, and the list
+  of methods that the interface defines.
+"""
+
 class JavaInterface:
     def __init__(self, interfaceName=""):
         self.interfaceName = interfaceName

@@ -1,3 +1,11 @@
+"""
+class JavaClass:
+- contains the information about a java class. this information include
+  class name, the classes it extends, the interfaces it implements and
+  the methods it has.
+"""
+
+
 class JavaClass:
     def __init__(self, className=""):
         self.className = className

@@ -1,9 +1,22 @@
+"""
+class Polymorphism:
+- measures the value of polymorphism using the structure of classes and interfaces.
+  it uses class polymorphismListener to obtain the information needed for classes
+  and interfaces.
+- when structures became available, for each method in a class, it recursively checks
+  for the existence of the method in the parent class itself, or in interfaces that
+  the parent class implements.
+  it also checks for the existence of the method in interfaces the class itself implements.
+  if any of the two cases happened, the method has been overridden, otherwise, it has not.
+"""
+
 from antlr4 import *
 from utils.file_reader import FileReader
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from .polymorphismListener import PolymorphismListener
 from .javaContainer import JavaCLassContainer, JavaInterfaceContaienr
+
 
 class Polymorphism:
     def __init__(self, projectPath):

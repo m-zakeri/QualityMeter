@@ -1,3 +1,10 @@
+"""
+class PolymorphismListener:
+- Extracts the structure of a class that contains the classes it extends, the interfaces it implements
+  and its methods.
+- Extracts the structure of an interface that contains the interfaces it extends, and its methods.
+"""
+
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import *
 from .javaInterface import JavaInterface

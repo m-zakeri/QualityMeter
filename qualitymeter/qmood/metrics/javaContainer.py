@@ -1,3 +1,13 @@
+"""
+class JavaClassContainer:
+- this keeps a list of java classes and allows inserting a class,
+  deleting a class, and querying for the existence of a class in the container.
+
+class JavaInterfaceContainer:
+- this keeps a list of java interfaces and allows inserting an interface,
+  deleting an interface, and querying for the existence of an interface in the container.
+"""
+
 from .javaClass import JavaClass
 
 class JavaCLassContainer:

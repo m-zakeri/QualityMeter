@@ -1,4 +1,16 @@
+"""
+class JavaMethod:
+- keeps the information about a method defined in java. the information contains
+  method name and a list that includes the type of parameters in the order that
+  they appear in the method.
+- it also overloads the == operator. two methods are equal when they have the
+  same method names and an equal number of parameters. when the number of
+  parameters is equal, the parameter types should also match. if all of these
+  cases happened, then the methods are considered equal.
+"""
+
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
+
 
 class JavaMethod:
     def __init__(self, methodName=""):
