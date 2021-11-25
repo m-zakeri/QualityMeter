@@ -35,39 +35,20 @@ class Abstraction:
 
     def setClassParents(self):
         for javaClass in self.classContainer.javaClassList():
-            javaBuiltInParents = []
             for parentName in javaClass.parentNameList():
                 if self.classContainer.getJavaClass(parentName):
                     javaClass.addParent(parentName, self.classContainer.getJavaClass(parentName))
-                else:
-                    javaBuiltInParents.append(parentName)
-
-            for builtInParent in javaBuiltInParents:
-                # We exclude inheriting Java built-in classes.
-                javaClass.removeParent(builtInParent)
 
         for javaClass in self.classContainer.javaClassList():
-            javaBuiltinInterfaces = []
             for interfaceName in javaClass.interfaceNameList():
                 if self.interfaceContainer.getJavaInterface(interfaceName):
                     javaClass.addInterface(interfaceName, self.interfaceContainer.getJavaInterface(interfaceName))
-                else:
-                    javaBuiltinInterfaces.append(interfaceName)
-
-            for javaBuiltinInterface in javaBuiltinInterfaces:
-                javaClass.removeInterface(javaBuiltinInterface)
 
     def setInterfaceParents(self):
         for javaInterface in self.interfaceContainer.javaInterfaceList():
-            javaBuiltinInterfaces = []
             for parentName in javaInterface.parentNameList():
                 if self.interfaceContainer.getJavaInterface(parentName):
                     javaInterface.addParent(parentName, self.interfaceContainer.getJavaInterface(parentName))
-                else:
-                    javaBuiltinInterfaces.append(parentName)
-
-            for builtInParent in javaBuiltinInterfaces:
-                javaInterface.removeParent(builtInParent)
 
     def calcAbstraction(self):
         for stream in FileReader.getFileStreams(self.projectPath):
@@ -76,3 +57,12 @@ class Abstraction:
             self.extractJavaInterfaces(listener)
         self.setClassParents()
         self.setInterfaceParents()
+
+        totalNumberOfAncestors = 0
+        for javaClass in self.classContainer.javaClassList():
+            ancestors = javaClass.getAllParents()
+            totalNumberOfAncestors += len(ancestors)
+
+        if self.classContainer.getSize() == 0:
+            return 0
+        return totalNumberOfAncestors / self.classContainer.getSize()

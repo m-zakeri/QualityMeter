@@ -8,8 +8,9 @@ from .metrics.abstraction import Abstraction
 class Extendability:
     def __init__(self, projectPath):
         self.projectPath = projectPath
-        # polymorphismValue = self.calcPolymorphism()
+        polymorphismValue = self.calcPolymorphism()
         abstractionValue = self.calcAbstraction()
+        print(polymorphismValue, abstractionValue)
 
     def calcAbstraction(self):
         abstractionMeter = Abstraction(self.projectPath)

@@ -25,6 +25,9 @@ class JavaCLassContainer:
         for _, javaClass in self.container.items():
             yield javaClass
 
+    def getSize(self):
+        return len(self.container)
+
 
 class JavaInterfaceContaienr:
     def __init__(self):

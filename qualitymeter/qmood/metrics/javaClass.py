@@ -86,3 +86,31 @@ class JavaClass:
     def interfaceObjectList(self):
         for interfaceName in self.interfaceList:
             yield self.interfaceList[interfaceName]
+
+    def getAllParents(self):
+        allParents = []
+        for interfaceName, interfaceObject in self.interfaceList.items():
+            if interfaceName not in allParents:
+                allParents.append(interfaceName)
+
+            # when interface is a built-in java interface, its object is None
+            if not interfaceObject:
+                continue
+
+            parentParents = interfaceObject.getAllParents()
+            for ancestor in parentParents:
+                if ancestor not in allParents:
+                    allParents.append(ancestor)
+
+        for className, classObject in self.parentClassList.items():
+            if className not in allParents:
+                allParents.append(className)
+
+            if not classObject:
+                continue
+
+            parentParents = classObject.getAllParents()
+            for ancestor in parentParents:
+                if ancestor not in allParents:
+                    allParents.append(ancestor)
+        return allParents

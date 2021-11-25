@@ -37,3 +37,19 @@ class JavaInterface:
                 if result:
                     return True
         return False
+
+    def getAllParents(self):
+        allParents = []
+        for parentName, parentObject in self.parentList.items():
+            if parentName not in allParents:
+                allParents.append(parentName)
+
+            if not parentObject:
+                continue
+
+            parentParents = parentObject.getAllParents()
+            for ancestor in parentParents:
+                if ancestor not in allParents:
+                    allParents.append(ancestor)
+
+        return allParents
