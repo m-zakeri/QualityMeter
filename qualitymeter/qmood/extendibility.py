@@ -8,20 +8,21 @@ from .metrics.abstraction import Abstraction
 class Extendability:
     def __init__(self, projectPath):
         self.projectPath = projectPath
+        self.polymorphismMeter = Polymorphism(self.projectPath)
+        self.abstractionMeter = Abstraction(self.projectPath)
+
         polymorphismValue = self.calcPolymorphism()
         abstractionValue = self.calcAbstraction()
-        print(polymorphismValue, abstractionValue)
+        inheritenceValue = self.calcInheritance()
 
     def calcAbstraction(self):
-        abstractionMeter = Abstraction(self.projectPath)
-        return abstractionMeter.calcAbstraction()
+        return self.abstractionMeter.calcAbstraction()
 
     def calcCoupling(self):
         pass
 
     def calcInheritance(self):
-        pass
+        return self.polymorphismMeter.calcInheritence()
 
     def calcPolymorphism(self):
-        polymorphismMeter = Polymorphism(self.projectPath)
-        return polymorphismMeter.calcPolymorphism()
+        return self.polymorphismMeter.calcPolymorphism()

@@ -24,6 +24,14 @@ class Polymorphism:
         self.javaClassContainer = JavaCLassContainer()
         self.javaInterfaceContainer = JavaInterfaceContaienr()
 
+        for stream in FileReader.getFileStreams(self.projectPath):
+            listener = self.getListener(stream)
+            self.extractStreamClasses(listener)
+            self.extractStreamInterfaces(listener)
+
+        self.setInterfaceParents()
+        self.setClassParents()
+
     def getListener(self, stream):
         lexer = JavaLexer(stream)
         tokenStream = CommonTokenStream(lexer)
@@ -84,19 +92,8 @@ class Polymorphism:
 
 
     def calcPolymorphism(self):
-        for stream in FileReader.getFileStreams(self.projectPath):
-            listener = self.getListener(stream)
-            self.extractStreamClasses(listener)
-            self.extractStreamInterfaces(listener)
-
-        self.setInterfaceParents()
-        self.setClassParents()
-
-        countMethods = 0
         countOverLoaded = 0
         for javaClass in self.javaClassContainer.javaClassList():
-            countMethods += javaClass.getNumMethods()
-
             for method in javaClass.methodList():
                 found = False
                 for interface in javaClass.interfaceObjectList():
@@ -112,5 +109,28 @@ class Polymorphism:
 
                 if found:
                     countOverLoaded += 1
-
         return countOverLoaded
+
+    def calcInheritence(self):
+        totalCountInherited = 0
+        totalCountMethods = 0
+        for javaClass in self.javaClassContainer.javaClassList():
+            inheritedMethods = javaClass.getInheritedMethodList()
+            countInherited = len(inheritedMethods)
+            countMethods = countInherited
+
+            for method in javaClass.methodList():
+                isOverriden = False
+                for iMethod in inheritedMethods:
+                    if iMethod == method:
+                        isOverriden = True
+                        break
+                if not isOverriden:
+                    countMethods += 1
+
+            totalCountInherited += countInherited
+            totalCountMethods += countMethods
+
+        if totalCountMethods == 0:
+            return 0
+        return totalCountInherited / totalCountMethods

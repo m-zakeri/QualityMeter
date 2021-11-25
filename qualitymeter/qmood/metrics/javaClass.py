@@ -42,9 +42,6 @@ class JavaClass:
     def getInterface(self, interfaceName):
         return self.interfaceList.get(interfaceName)
 
-    def getNumMethods(self):
-        return len(self.methods)
-
     def hasMethod(self, foreignMethod):
         for method in self.methods:
             if method == foreignMethod:
@@ -114,3 +111,42 @@ class JavaClass:
                 if ancestor not in allParents:
                     allParents.append(ancestor)
         return allParents
+
+    def getInheritedMethodList(self):
+        def isDuplicateMethod(method, methodList):
+            for m in methodList:
+                if m == method:
+                    return True
+            return False
+
+        if not self.parentClassList and not self.interfaceList:
+            return []
+
+        result = []
+        for interfaceName, interfaceObject in self.interfaceList.items():
+            if not interfaceObject:
+                continue
+
+            for iMethod in interfaceObject.methodList():
+                if not isDuplicateMethod(iMethod, result):
+                    result.append(iMethod)
+
+            inheritedMethods = interfaceObject.getInheritedMethodList()
+            for method in inheritedMethods:
+                if not isDuplicateMethod(method, result):
+                    result.append(method)
+
+        for className, classObject in self.parentClassList.items():
+            if not classObject:
+                continue
+
+            for method in classObject.methodList():
+                if not isDuplicateMethod(method, result):
+                    result.append(method)
+
+            inheritedMethods = classObject.getInheritedMethodList()
+            for method in inheritedMethods:
+                if not isDuplicateMethod(method, result):
+                    result.append(method)
+
+        return result

@@ -25,6 +25,10 @@ class JavaInterface:
         for parentName in self.parentList:
             yield parentName
 
+    def methodList(self):
+        for method in self.methods:
+            yield method
+
     def hasMethod(self, foreignMethod):
         for method in self.methods:
             if method == foreignMethod:
@@ -53,3 +57,28 @@ class JavaInterface:
                     allParents.append(ancestor)
 
         return allParents
+
+    def getInheritedMethodList(self):
+        def isDuplicateMethod(method, methodList):
+            for m in methodList:
+                if m == method:
+                    return True
+            return False
+
+        if not self.parentList:
+            return []
+
+        result = []
+        for parentName, parentObject in self.parentList.items():
+            if not parentObject:
+                continue
+
+            for pMethod in parentObject.methodList():
+                if not isDuplicateMethod(pMethod, result):
+                    result.append(pMethod)
+
+            parentMethods = parentObject.getInheritedMethodList()
+            for pMethod in parentMethods:
+                if not isDuplicateMethod(pMethod, result):
+                    result.append(pMethod)
+        return result
