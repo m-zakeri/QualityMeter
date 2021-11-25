@@ -3,14 +3,17 @@
 
 """
 from .metrics.polymorphism import Polymorphism
+from .metrics.abstraction import Abstraction
 
 class Extendability:
     def __init__(self, projectPath):
         self.projectPath = projectPath
-        polymorphismValue = self.calcPolymorphism()
+        # polymorphismValue = self.calcPolymorphism()
+        abstractionValue = self.calcAbstraction()
 
     def calcAbstraction(self):
-        pass
+        abstractionMeter = Abstraction(self.projectPath)
+        return abstractionMeter.calcAbstraction()
 
     def calcCoupling(self):
         pass
