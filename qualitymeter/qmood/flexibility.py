@@ -1,13 +1,13 @@
 from antlr4 import *
-from ..gen.javaLabeled.JavaLexer import JavaLexer
-from ..gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
-from ..gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
+from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
+from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
+from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 
 
 class encapsulationListener(JavaParserLabeledListener):
 
     """
-    This class is a custom listener for Encapsulation (DAM) metric.
+    This class is a custom listener for Encapsulation (DAM) metric assessment.
     """
 
     def __init__(self, class_name):
@@ -48,7 +48,7 @@ class encapsulationListener(JavaParserLabeledListener):
 if __name__ == "__main__":
     walker = ParseTreeWalker()
 
-    stream = FileStream("/media/soroush/Storage 1/QualityMeter/test.java", encoding="utf-8")
+    stream = FileStream("test.java", encoding="utf-8")
     lexer = JavaLexer(stream)
     token_stream = CommonTokenStream(lexer)
     parser = JavaParserLabeled(token_stream)
