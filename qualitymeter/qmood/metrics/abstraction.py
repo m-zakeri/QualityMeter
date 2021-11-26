@@ -1,3 +1,11 @@
+"""
+class Abstraction
+- this class calculates the meter of abstraction by finding the number of parent
+  classes for each class. it then returns the average number of parents for each
+  class as the metric for Abstraction.
+"""
+
+
 from antlr4 import *
 from utils.file_reader import FileReader
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer

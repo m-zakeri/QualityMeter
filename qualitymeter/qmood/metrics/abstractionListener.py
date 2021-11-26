@@ -1,3 +1,9 @@
+"""
+class AbstractionListener
+- this class extracts java classes and the classes they extend or the interfaces
+  they implement.
+"""
+
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.qmood.metrics.javaClass import JavaClass

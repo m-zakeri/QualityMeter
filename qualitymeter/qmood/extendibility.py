@@ -11,9 +11,10 @@ class Extendability:
         self.polymorphismMeter = Polymorphism(self.projectPath)
         self.abstractionMeter = Abstraction(self.projectPath)
 
-        polymorphismValue = self.calcPolymorphism()
-        abstractionValue = self.calcAbstraction()
-        inheritenceValue = self.calcInheritance()
+        self.polymorphismValue = self.calcPolymorphism()
+        self.abstractionValue = self.calcAbstraction()
+        self.inheritenceValue = self.calcInheritance()
+
 
     def calcAbstraction(self):
         return self.abstractionMeter.calcAbstraction()
@@ -26,3 +27,6 @@ class Extendability:
 
     def calcPolymorphism(self):
         return self.polymorphismMeter.calcPolymorphism()
+
+    def getExtendabilityMeasure(self):
+        return 0.5 * (self.abstractionValue + self.inheritenceValue + self.polymorphismValue)
