@@ -17,10 +17,6 @@ class Extendability:
         self.inheritanceValue = self.calcInheritance()
         self.couplingValue = self.calcCoupling()
 
-        print("polymorphism = ", self.polymorphismValue,
-              "abstraction = ", self.abstractionValue,
-              "inheritance = ", self.inheritanceValue,
-              "coupling = ", self.couplingValue)
 
     def calcAbstraction(self):
         return self.abstractionMeter.calcAbstraction()
