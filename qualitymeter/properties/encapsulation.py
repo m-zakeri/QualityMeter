@@ -30,4 +30,7 @@ class Encapsulation(JavaParserLabeledListener):
 
     def exitCompilationUnit(self, ctx: JavaParserLabeled.CompilationUnitContext):
         # calculating ratio for private attributes to all attributes.
-        self.__result = self.__private_count / self.__attributes_count
+        if self.__attributes_count != 0:
+            self.__result = self.__private_count / self.__attributes_count
+        else:
+            return 0

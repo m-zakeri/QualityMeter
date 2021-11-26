@@ -50,4 +50,7 @@ class Abstraction(JavaParserLabeledListener):
         counts = []
         for a in self.__abstracts:
             counts.append(a["count"])
-        self.__result = sum(counts) / len(counts)
+        if len(counts) != 0:
+            self.__result = sum(counts) / len(counts)
+        else:
+            return 0
