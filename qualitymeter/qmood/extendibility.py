@@ -4,6 +4,7 @@
 """
 from .metrics.polymorphism import Polymorphism
 from .metrics.abstraction import Abstraction
+from .metrics.coupling import Coupling
 
 class Extendability:
     def __init__(self, projectPath):
@@ -13,14 +14,20 @@ class Extendability:
 
         self.polymorphismValue = self.calcPolymorphism()
         self.abstractionValue = self.calcAbstraction()
-        self.inheritenceValue = self.calcInheritance()
+        self.inheritanceValue = self.calcInheritance()
+        self.couplingValue = self.calcCoupling()
 
+        print("polymorphism = ", self.polymorphismValue,
+              "abstraction = ", self.abstractionValue,
+              "inheritance = ", self.inheritanceValue,
+              "coupling = ", self.couplingValue)
 
     def calcAbstraction(self):
         return self.abstractionMeter.calcAbstraction()
 
     def calcCoupling(self):
-        pass
+        couplingMeter = Coupling(self.projectPath)
+        return couplingMeter.calcCoupling()
 
     def calcInheritance(self):
         return self.polymorphismMeter.calcInheritence()
@@ -29,4 +36,5 @@ class Extendability:
         return self.polymorphismMeter.calcPolymorphism()
 
     def getExtendabilityMeasure(self):
-        return 0.5 * (self.abstractionValue + self.inheritenceValue + self.polymorphismValue)
+        return 0.5 * (self.abstractionValue - self.couplingValue
+              + self.inheritanceValue + self.polymorphismValue)
