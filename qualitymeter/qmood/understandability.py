@@ -7,6 +7,8 @@ from qualitymeter.properties.cohesion import Cohesion
 from qualitymeter.properties.designSize import DesignSize
 from qualitymeter.properties.abstraction import Abstraction
 from qualitymeter.properties.encapsulation import Encapsulation
+from qualitymeter.properties.polymorphism import Polymorphism
+from qualitymeter.properties.complexity import Complexity
 
 from .quality_attribute import QualityAttribute
 
@@ -16,39 +18,90 @@ class Understandability(QualityAttribute):
         QualityAttribute.__init__(self, stream)
 
     def calc_coupling(self):
+        """
+        calculating coupling.
+
+        :return: results
+        """
         listener = Coupling(self.common_listener.classes_name)
         self.walker.walk(listener, self.parse_tree)
         return sum(listener.result) / len(listener.result)
 
     def calc_cohesion(self):
+        """
+        calculating cohesion.
+
+        :return: results
+        """
         listener = Cohesion(self.common_listener.classes)
         self.walker.walk(listener, self.parse_tree)
         return sum(listener.result) / len(listener.result)
 
     def calc_design_size(self):
+        """
+        calculating design size.
+
+        :return: results
+        """
         listener = DesignSize()
         self.walker.walk(listener, self.parse_tree)
         return listener.result
 
     def calc_abstraction(self):
+        """
+        calculating abstraction.
+
+        :return: results
+        """
         listener = Abstraction()
         self.walker.walk(listener, self.parse_tree)
         return listener.result
 
     def calc_encapsulation(self):
+        """
+        calculating encapsulation.
+
+        :return: results
+        """
         listener = Encapsulation()
         self.walker.walk(listener, self.parse_tree)
         return listener.result
 
+    def calc_polymorphism(self):
+        """
+        calculating polymorphism.
+
+        :return: results
+        """
+        listener = Polymorphism()
+        self.walker.walk(listener, self.parse_tree)
+        return listener.result
+
+    def calc_complexity(self):
+        """
+        calculating complexity.
+
+        :return: results
+        """
+        listener = Complexity()
+        self.walker.walk(listener, self.parse_tree)
+        return listener.result
+
     def get_value(self):
+        """
+        returning the final results along the Design Property metrics.
+
+        :return: understandability, coupling, cohesion, design_size, abstraction, encapsulation, polymorphism, complexity
+        """
         coupling = self.calc_coupling()
         cohesion = self.calc_cohesion()
         design_size = self.calc_design_size()
         abstraction = self.calc_abstraction()
         encapsulation = self.calc_encapsulation()
+        polymorphism = self.calc_polymorphism()
+        complexity = self.calc_complexity()
 
+        understandability = -0.33 * abstraction + 0.33 * encapsulation - 0.33 * coupling + 0.33 * cohesion\
+                            - 0.33 * polymorphism - 0.33 * complexity - 0.33 * design_size
 
-        print('Coupling: ' + str(coupling))
-        print('Cohesion: ' + str(cohesion))
-
-        # raise NotImplementedError()    # TODO: Calculate Understandability Formula
+        return understandability, coupling, cohesion, design_size, abstraction, encapsulation, polymorphism, complexity

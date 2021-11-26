@@ -1,6 +1,5 @@
 """
-
-
+Utility module for reading files.
 """
 
 import glob
