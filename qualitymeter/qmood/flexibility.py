@@ -11,7 +11,7 @@ class polymorphismListener(JavaParserLabeledListener):
         self.__number_of_polymorphic_methods = 0
 
     @property
-    def get_number_of_extended_classes(self):
+    def get_number_of_polymorphic_methods(self):
         return self.__number_of_polymorphic_methods
 
     # count the number of polymorphic methods
@@ -27,7 +27,7 @@ class polymorphismListener(JavaParserLabeledListener):
 
 
 if __name__ == '__main__':
-    stream = FileStream("your file path", encoding='utf-8')
+    stream = FileStream("C:/Users/Maple/Desktop/test.java", encoding='utf-8')
     lexer = JavaLexer(stream)
     token_stream = CommonTokenStream(lexer)
     parser = JavaParserLabeled(token_stream)
@@ -35,4 +35,4 @@ if __name__ == '__main__':
     my_listener = polymorphismListener()
     walker = ParseTreeWalker()
     walker.walk(t=pars_tree, listener=my_listener)
-    print("Number of Polymorphic Methods:", my_listener.get_number_of_extended_classes)
+    print("Number of Polymorphic Methods:", my_listener.get_number_of_polymorphic_methods)
