@@ -44,9 +44,6 @@ class Coupling(JavaParserLabeledListener):
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         ctx = ctx.formalParameters().formalParameterList()
-        
-        if ctx is None:
-            return
-        
+
         for item in ctx.formalParameter():
             self.__calc_dcc(item)
