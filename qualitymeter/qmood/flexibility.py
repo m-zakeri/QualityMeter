@@ -22,7 +22,7 @@ class myListener(JavaParserLabeledListener):
             
  if __name__ == '__main__':
  
-    stream = FileStream(test.java, encoding='utf8')
+    stream = FileStream(A.java, encoding='utf8')
     lexer = JavaLexer(stream)
     token_stream = CommonTokenStream(lexer)
     parser = JavaParserLabeled(token_stream)
