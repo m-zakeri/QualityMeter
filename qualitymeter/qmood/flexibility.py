@@ -8,17 +8,22 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLab
 class polymorphismListener(JavaParserLabeledListener):
 
     def __init__(self):
-        self.__number_of_extended_classes = 0
+        self.__number_of_polymorphic_methods = 0
 
     @property
     def get_number_of_extended_classes(self):
-        return self.__number_of_extended_classes
+        return self.__number_of_polymorphic_methods
 
     # count the number of polymorphic methods
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
         # check if method overriding occurs
+        if ctx.EXTENDS() is not None or ctx.IMPLEMENTS() is not None:
+            self.__number_of_polymorphic_methods += 1
+
+    def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceDeclarationContext):
+        # if a class implements an interface
         if ctx.EXTENDS() is not None:
-            self.__number_of_extended_classes += 1
+            self.__number_of_polymorphic_methods += 1
 
 
 if __name__ == '__main__':
