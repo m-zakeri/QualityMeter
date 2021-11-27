@@ -1,8 +1,10 @@
 """
 Utility module for reading files.
+
 """
 
 import glob
+
 from antlr4 import FileStream
 
 

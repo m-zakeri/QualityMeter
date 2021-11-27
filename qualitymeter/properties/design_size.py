@@ -1,5 +1,6 @@
 """
-A Listener class to calculate design size.
+A listener class to calculate design size.
+
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled

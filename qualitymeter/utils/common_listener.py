@@ -1,5 +1,5 @@
 """
-
+A listener class which calculates common prerequisites
 
 """
 

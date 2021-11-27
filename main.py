@@ -1,6 +1,8 @@
 """
 Entry point of the program.
+
 """
+
 import argparse
 import sys
 from tabulate import tabulate
@@ -19,7 +21,7 @@ def main(arguments):
 
     stream = FileReader.get_file_stream(arguments.file)
     understandability, coupling, cohesion, design_size, abstraction, \
-    encapsulation, polymorphism, complexity = Understandability(stream).get_value()
+        encapsulation, polymorphism, complexity = Understandability(stream).get_value()
 
     table = [["understandability", understandability], ["coupling", coupling], ["cohesion", cohesion],
              ["design_size", design_size], ["abstraction", abstraction], ["encapsulation", encapsulation],
