@@ -1,5 +1,6 @@
 """
-A Listener class to calculate encapsulation.
+A listener class to calculate encapsulation value.
+
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled

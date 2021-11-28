@@ -1,6 +1,8 @@
 """
 Entry point of the program.
+
 """
+
 import argparse
 import sys
 from tabulate import tabulate

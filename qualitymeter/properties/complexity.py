@@ -1,5 +1,6 @@
 """
-A Listener class to calculate number of method.
+A listener class to calculate number of method.
+
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled

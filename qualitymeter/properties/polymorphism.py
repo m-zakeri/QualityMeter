@@ -1,5 +1,6 @@
 """
-A Listener class to calculate polymorphism.
+A listener class to calculate polymorphism value.
+
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled

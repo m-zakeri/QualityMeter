@@ -1,9 +1,15 @@
 """
 Utility module for reading files.
+
 """
 
+<<<<<<< HEAD
 # import glob
 import os
+=======
+import glob
+
+>>>>>>> 2a177eb0e2582ef311bc96d741e10570dc856b50
 from antlr4 import FileStream
 
 

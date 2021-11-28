@@ -1,5 +1,6 @@
 """
-A Listener class to calculate abstraction.
+A listener class to calculate abstraction value.
+
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
