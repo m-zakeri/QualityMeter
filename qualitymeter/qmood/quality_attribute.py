@@ -5,7 +5,7 @@ This file contains the creation of the walker for commonListener
 from antlr4 import CommonTokenStream, ParseTreeWalker
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
-from qualitymeter.utils.common_listener import CommonListener
+from qualitymeter.properties.listener import Listener
 
 
 class QualityAttribute:
@@ -21,6 +21,8 @@ class QualityAttribute:
         # create Walker
         self.walker = ParseTreeWalker()
         # import common listener to be walked.
-        self.common_listener = CommonListener()
+        self.listener = Listener()
         # walk the tree.
-        self.walker.walk(self.common_listener, self.parse_tree)
+        self.walker.walk(self.listener, self.parse_tree)
+
+        return self.listener
