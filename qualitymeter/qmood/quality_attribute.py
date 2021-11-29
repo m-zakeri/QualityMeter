@@ -7,7 +7,7 @@ from antlr4 import CommonTokenStream, ParseTreeWalker
 
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
-from qualitymeter.properties.listener import Listener
+from qualitymeter.listener.listener import Listener
 
 
 class QualityAttribute:

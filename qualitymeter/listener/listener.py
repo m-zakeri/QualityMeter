@@ -1,6 +1,6 @@
 """
 Class MyListener -> here we extract all the design metrics needed to calculate
-    design properties like
+    design listener like
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
