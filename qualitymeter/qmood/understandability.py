@@ -8,6 +8,7 @@ from .quality_attribute import QualityAttribute
 from qualitymeter.properties.coupling import Coupling
 from qualitymeter.properties.cohesion import Cohesion
 
+
 class Understandability(QualityAttribute):
     def __init__(self, streams):
         self.streams = streams
@@ -133,7 +134,7 @@ class Understandability(QualityAttribute):
             list_of_methods.append(len(cls.methods))
 
         if len(list_of_methods) != 0:
-            result = sum(list_of_methods)/len(list_of_methods)
+            result = sum(list_of_methods) / len(list_of_methods)
         else:
             result = 0
 
@@ -161,7 +162,7 @@ class Understandability(QualityAttribute):
         print(polymorphism)
         print(complexity)
 
-        understandability = -0.33 * abstraction + 0.33 * encapsulation - 0.33 * coupling + 0.33 * cohesion\
+        understandability = -0.33 * abstraction + 0.33 * encapsulation - 0.33 * coupling + 0.33 * cohesion \
                             - 0.33 * polymorphism - 0.33 * complexity - 0.33 * design_size
 
         return understandability, coupling, cohesion, design_size, abstraction, encapsulation, polymorphism, complexity
