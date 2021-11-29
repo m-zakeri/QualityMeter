@@ -89,9 +89,19 @@ class Listener(JavaParserLabeledListener):
             self.__currentMethod = ctx.memberDeclaration().methodDeclaration().IDENTIFIER()
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        """
+
+        :param ctx:
+        :return:
+        """
         self.__is_enter_method = True
 
     def exitMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        """
+
+        :param ctx:
+        :return:
+        """
         self.__currentClass.add_method(self.__currentMethod,
                                        self.__currentMethodParametersType,
                                        self.__currentMethodParameters,
@@ -106,12 +116,10 @@ class Listener(JavaParserLabeledListener):
         self.__currentAttributesModifiers = []
 
     def enterPrimary4(self, ctx: JavaParserLabeled.Primary4Context):
+        """
+
+        :param ctx:
+        :return:
+        """
         if self.__is_enter_method:
             self.__currentMethodVariables.append(ctx.IDENTIFIER().getText())
-
-    # def exitClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
-    # self.currentClassBodyDeclaration = None
-    # def exitCompilationUnit(self, ctx: JavaParserLabeled.CompilationUnitContext):
-    #     for cl in self.__classes:
-    #         for met in cl.methods:
-    #             print("class {0}, method {1}".format(cl.identifier, met.modifiers))

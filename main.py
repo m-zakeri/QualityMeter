@@ -18,7 +18,7 @@ def main(arguments):
     :return:
     """
 
-    # creating the streams of files to be walked by the Undestandability class
+    # creating the streams of files to be walked by the Understandability class
     streams = FileReader.getFileStreams(arguments.path)
     understandability, coupling, cohesion, design_size, abstraction, \
         encapsulation, polymorphism, complexity = Understandability(streams).get_value()
@@ -33,6 +33,7 @@ def main(arguments):
     print("\n\n\nThe Project Report For: {0} \n\n".format(arguments.path))
     print(tabulate(table, headers, tablefmt="presto"))
     print("\n\n")
+
 
 # Taking the arguments from user and starting the program
 if __name__ == "__main__":

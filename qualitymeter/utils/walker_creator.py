@@ -10,7 +10,7 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.listener.listener import Listener
 
 
-class QualityAttribute:
+class WalkerCreator:
     def __init__(self, streams):
         self.classes = []
 
