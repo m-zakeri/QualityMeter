@@ -95,7 +95,7 @@ class Cohesion(JavaParserLabeledListener):
         None
         """
 
-        # Check if the number of functions or global variable of a class is zero or not.
+        # Check if the number of methods or global variable of a class is zero or not.
         if len(self.__classes[self.__counter][1]) == 0 or len(self.__classes[self.__counter][2]) == 0:
             # If zero then cc is zero.
             self.__result.append(0.0)

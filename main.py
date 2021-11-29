@@ -5,7 +5,6 @@ Entry point of the program.
 
 import argparse
 import sys
-import shutil
 from tabulate import tabulate
 from qualitymeter.utils.file_reader import FileReader
 from qualitymeter.qmood.understandability import Understandability
@@ -20,7 +19,7 @@ def main(arguments):
     """
 
     # creating the streams of files to be walked by the Undestandability class
-    streams = FileReader.getFileStreams(arguments.file)
+    streams = FileReader.getFileStreams(arguments.path)
     understandability, coupling, cohesion, design_size, abstraction, \
         encapsulation, polymorphism, complexity = Understandability(streams).get_value()
 
@@ -28,22 +27,21 @@ def main(arguments):
     table = [["understandability", understandability], ["coupling", coupling], ["cohesion", cohesion],
              ["design_size", design_size], ["abstraction", abstraction], ["encapsulation", encapsulation],
              ["polymorphism", polymorphism], ["complexity", complexity]]
-    headers = ["design metric", "value"]
+    headers = ["metric name", "value"]
 
-    # printing the result of the program in the center of the program.
-    columns = shutil.get_terminal_size().columns
-    print("The Project Report For: {0} \n\n".format(arguments.file).center(columns))
-    print(tabulate(table, headers, tablefmt="presto").center(columns))
-
+    # printing the results.
+    print("\n\n\nThe Project Report For: {0} \n\n".format(arguments.path))
+    print(tabulate(table, headers, tablefmt="presto"))
+    print("\n\n")
 
 # Taking the arguments from user and starting the program
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--file',
-        help='file address')
+        '--path',
+        help='path for project')
     args = parser.parse_args()
-    if not args.file:
+    if not args.path:
         parser.print_help()
         sys.exit(1)
-    main()
+    main(args)

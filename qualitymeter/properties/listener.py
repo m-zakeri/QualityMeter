@@ -2,6 +2,7 @@
 Class MyListener -> here we extract all the design metrics needed to calculate
     design properties like
 """
+
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.java_components.java_class import JavaClass
@@ -12,8 +13,12 @@ class Listener(JavaParserLabeledListener):
     def __init__(self):
         self.__classes = []
         self.__currentClass = None
+        self.__currentMethod = None
+        self.__currentMethodParametersType = []
         self.__currentMethodParameters = []
         self.__currentMethodModifiers = []
+        self.__currentMethodVariables = []
+        self.__is_enter_method = False
         self.__currentAttributesModifiers = []
 
     @property
@@ -44,7 +49,6 @@ class Listener(JavaParserLabeledListener):
                 for implementation in implementations.classOrInterfaceType().IDENTIFIER():
                     self.__currentClass.add_implementation(implementation)
 
-
     def exitClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
         """
 
@@ -57,7 +61,6 @@ class Listener(JavaParserLabeledListener):
         else:
             self.__currentClass = None
 
-
     def enterClassBodyDeclaration2(self, ctx: JavaParserLabeled.ClassBodyDeclaration2Context):
         """
 
@@ -65,11 +68,13 @@ class Listener(JavaParserLabeledListener):
         :return:
         """
         if isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration2Context):
-            for varDec in ctx.memberDeclaration().fieldDeclaration().variableDeclarators().variableDeclarator():
+            field_dec = ctx.memberDeclaration().fieldDeclaration()
+            for varDec in field_dec.variableDeclarators().variableDeclarator():
                 for i in ctx.modifier():
                     if i.classOrInterfaceModifier():
                         self.__currentAttributesModifiers.append(i.classOrInterfaceModifier().getText())
-                self.__currentClass.add_attribute(varDec.variableDeclaratorId().IDENTIFIER(),
+                self.__currentClass.add_attribute(field_dec.typeType().getText(),
+                                                  varDec.variableDeclaratorId().IDENTIFIER(),
                                                   self.__currentAttributesModifiers)
 
         elif isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context):
@@ -79,12 +84,30 @@ class Listener(JavaParserLabeledListener):
                     if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
                         for p in ctx.memberDeclaration().methodDeclaration(). \
                                 formalParameters().formalParameterList().formalParameter():
+                            self.__currentMethodParametersType.append(p.typeType().getText())
                             self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
-            self.__currentClass.add_method(ctx.memberDeclaration().methodDeclaration().IDENTIFIER(),
-                                           self.__currentMethodParameters, self.__currentMethodModifiers)
-            self.__currentMethodParameters = []
-            self.__currentMethodModifiers = []
-            self.__currentAttributesModifiers = []
+            self.__currentMethod = ctx.memberDeclaration().methodDeclaration().IDENTIFIER()
+
+    def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        self.__is_enter_method = True
+
+    def exitMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        self.__currentClass.add_method(self.__currentMethod,
+                                       self.__currentMethodParametersType,
+                                       self.__currentMethodParameters,
+                                       self.__currentMethodModifiers,
+                                       self.__currentMethodVariables)
+        self.__currentMethod = None
+        self.__currentMethodParametersType = []
+        self.__currentMethodParameters = []
+        self.__currentMethodModifiers = []
+        self.__currentMethodVariables = []
+        self.__is_enter_method = False
+        self.__currentAttributesModifiers = []
+
+    def enterPrimary4(self, ctx: JavaParserLabeled.Primary4Context):
+        if self.__is_enter_method:
+            self.__currentMethodVariables.append(ctx.IDENTIFIER().getText())
 
     # def exitClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
     # self.currentClassBodyDeclaration = None

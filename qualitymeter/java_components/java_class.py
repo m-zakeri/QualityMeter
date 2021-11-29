@@ -14,12 +14,12 @@ class JavaClass:
         self.__implementations = []
         self.__outer_class = None
 
-    def add_method(self, identifier, parameters, modifier):
-        method = JavaMethod(identifier, parameters, modifier)
+    def add_method(self, identifier, parameters_type, parameters, modifier, variables):
+        method = JavaMethod(identifier, parameters_type, parameters, modifier, variables)
         self.__methods.append(method)
 
-    def add_attribute(self, identifier, modifiers):
-        attribute = JavaAttribute(identifier, modifiers)
+    def add_attribute(self, datatype, identifier, modifiers):
+        attribute = JavaAttribute(datatype, identifier, modifiers)
         self.__attributes.append(attribute)
 
     def add_parent(self, identifier):
