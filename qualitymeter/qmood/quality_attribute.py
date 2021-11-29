@@ -11,20 +11,27 @@ from qualitymeter.properties.listener import Listener
 
 
 class QualityAttribute:
-    def __init__(self, stream):
-        # Create lexer from data stream.
-        self.lexer = JavaLexer(stream)
-        # Create token from lexer.
-        self.token_stream = CommonTokenStream(self.lexer)
-        # Create parser from tokens.
-        self.parser = JavaParserLabeled(self.token_stream)
-        # Create tree from the first rule of the parser.
-        self.parse_tree = self.parser.compilationUnit()
-        # Create walker
-        self.walker = ParseTreeWalker()
-        # import common listener to be walked.
-        self.listener = Listener()
-        # walk the tree.
-        self.walker.walk(self.listener, self.parse_tree)
+    def __init__(self, streams):
+        self.classes = []
 
-        return self.listener
+        for stream in streams:
+            # Create lexer from data stream.
+            lexer = JavaLexer(stream)
+            # Create token from lexer.
+            token_stream = CommonTokenStream(lexer)
+            # Create parser from tokens.
+            parser = JavaParserLabeled(token_stream)
+            # Create a tree from the first rule of the parser.
+            parse_tree = parser.compilationUnit()
+            # Import common listener to be walked.
+            listener = Listener()
+            # Create walker
+            walker = ParseTreeWalker()
+            # Walk the tree.
+            walker.walk(listener, parse_tree)
+            # Save the tree's classes
+            for cls in listener.classes:
+                self.classes.append(cls)
+
+    def find_parent(self, parent):
+        return [cls for cls in self.classes if cls.identifier.getText() == parent.identifier]

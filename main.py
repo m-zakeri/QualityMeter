@@ -41,4 +41,4 @@ if __name__ == "__main__":
     if not args.file:
         parser.print_help()
         sys.exit(1)
-    main()
+    main(args)
