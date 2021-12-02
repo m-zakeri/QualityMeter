@@ -1,0 +1,11 @@
+.python-version
+pyenv.cfg
+.idea/
+venv/
+.venv/
+build/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+__pycache__/
