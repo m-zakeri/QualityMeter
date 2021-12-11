@@ -61,6 +61,8 @@ class InfoExtractorListener(JavaParserLabeledListener):
         self.__user_defined.add(ctx.IDENTIFIER().getText())
 
     def enterMemberDeclaration0(self, ctx: JavaParserLabeled.MemberDeclaration0Context):
+        if 'method_count' not in self.__class_info:
+            return
         self.__class_info['method_count'] += 1
         inheritablef = True
         finalf = False
@@ -76,6 +78,8 @@ class InfoExtractorListener(JavaParserLabeledListener):
                 self.__class_info['final_method_count'] += 1
 
     def enterMemberDeclaration2(self, ctx: JavaParserLabeled.MemberDeclaration2Context):
+        if 'total_field' not in self.__class_info:
+            return
         self.__class_info['total_field'] += 1
         for i in ctx.parentCtx.modifier():
             text = i.getText()
