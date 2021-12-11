@@ -82,10 +82,17 @@ class Listener(JavaParserLabeledListener):
                 if i.classOrInterfaceModifier():
                     self.__currentMethodModifiers.append(i.classOrInterfaceModifier().getText())
                     if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
-                        for p in ctx.memberDeclaration().methodDeclaration(). \
-                                formalParameters().formalParameterList().formalParameter():
-                            self.__currentMethodParametersType.append(p.typeType().getText())
-                            self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
+                        if isinstance(ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                                      JavaParserLabeled.FormalParameterList0Context):
+                            for p in ctx.memberDeclaration().methodDeclaration(). \
+                                    formalParameters().formalParameterList().formalParameter():
+                                self.__currentMethodParametersType.append(p.typeType().getText())
+                                self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
+                        # if isinstance(
+                        #         ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                        #         JavaParserLabeled.FormalParameterList1Context):
+                        #     # print("FormalParameterList1Context")
+
             self.__currentMethod = ctx.memberDeclaration().methodDeclaration().IDENTIFIER()
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):

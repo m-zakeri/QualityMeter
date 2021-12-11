@@ -30,8 +30,10 @@ def main(arguments):
     headers = ["metric name", "value"]
 
     # printing the results.
-    print("\n\n\nThe Project Report For: {0} \n\n".format(arguments.path))
-    print(tabulate(table, headers, tablefmt="presto"))
+    title = "\n\n\nThe Project Report for: {0}\n\n".format(arguments.path)
+    table_result = tabulate(table, headers, tablefmt="presto")
+    print(title)
+    print(table_result)
     print("\n\n")
 
 
