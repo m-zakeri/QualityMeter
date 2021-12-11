@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/home/funlife/Downloads/QualityMeter/")
 from antlr4 import *
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
@@ -10,7 +12,7 @@ class encapsulationListener(JavaParserLabeledListener):
     This class is a custom listener for Encapsulation (DAM) metric assessment.
     """
 
-    def __init__(self, class_name):
+    def __init__(self):
         """
         This method initializes the object and attributes.
 
@@ -23,35 +25,9 @@ class encapsulationListener(JavaParserLabeledListener):
 
         self.__number_of_private_attrs = 0
         self.__number_of_total_attrs = 0
-        self.__class_name = class_name
-        self.__is_enter_class = False
-
-    def get_number_of_private_attrs(self):
-        """
-        This method is the getter of the number of private attributes.
-
-        Args:
-            None
-
-        Returns:
-            int: number of private attributes
-        """
-
-        return self.__number_of_private_attrs
-
-    def get_number_of_total_attrs(self):
-        """
-        This method is the getter of the number of total attributes,
-        including public, private, and protected attributes.
-
-        Args:
-            None
-
-        Returns:
-            int: number of private attributes
-        """
-
-        return self.__number_of_total_attrs
+        self.__class_name = None
+        self.total_classes = {}
+        self.last_number_of_private_attrs = 0
 
     def get_DAM_ratio(self):
         """
@@ -65,9 +41,12 @@ class encapsulationListener(JavaParserLabeledListener):
         Returns:
             float: DAM ratio
         """
-
-        return self.__number_of_private_attrs / self.__number_of_total_attrs if self.__number_of_total_attrs > 0 else 0
-
+        
+        dams = list(map(lambda key: self.total_classes[key][0] / self.total_classes[key][1] if self.total_classes[key][1] != 0 else 0, self.total_classes.keys()))
+        DAM_metric = sum(dams) / len(dams)
+        
+        return DAM_metric
+        
     def enterClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
         """
         This method ensures that we have entered to the intended class,
@@ -79,24 +58,9 @@ class encapsulationListener(JavaParserLabeledListener):
         Returns:
             None
         """
-
-        if ctx.IDENTIFIER().getText() == self.__class_name:
-            self.__is_enter_class = True
-
-    def exitClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
-        """
-        This method ensures that we have left the intended class,
-        as this method is called once the walker is leaving a class in the source code.
-
-        Args:
-            ClassDeclaration Context
-
-        Returns:
-            None
-        """
-
-        if ctx.IDENTIFIER().getText() == self.__class_name and self.__is_enter_class:
-            self.__is_enter_class = False
+	    
+        self.__class_name = ctx.IDENTIFIER().getText()
+        self.total_classes[self.__class_name] = (0, 0)
 
     def enterFieldDeclaration(self, ctx:JavaParserLabeled.FieldDeclarationContext):
         """
@@ -110,8 +74,10 @@ class encapsulationListener(JavaParserLabeledListener):
             None
         """
 
-        if self.__is_enter_class:
-            self.__number_of_total_attrs += 1
+        prv_attrs, tot_attrs = self.total_classes[self.__class_name]
+        prv_attrs = prv_attrs + self.last_number_of_private_attrs
+        tot_attrs = tot_attrs + 1
+        self.total_classes[self.__class_name] = (prv_attrs, tot_attrs)
 
     def enterClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
         """
@@ -125,9 +91,12 @@ class encapsulationListener(JavaParserLabeledListener):
             None
         """
 
+        prv_attrs, tot_attrs = self.total_classes[self.__class_name]
+        self.last_number_of_private_attrs = 0
+
         modifier_list = ctx.modifier()
         # check if we are in the intented class and it has any defined attributes 
-        if self.__is_enter_class and len(modifier_list) > 0:
+        if len(modifier_list) > 0:
             # getting the name of the private attribute, returns None is there is no private attribute
             attr_type_private = modifier_list[0].classOrInterfaceModifier().PRIVATE()
             # getting the name of the protected attribute, returns None is there is no protected attribute
@@ -135,8 +104,8 @@ class encapsulationListener(JavaParserLabeledListener):
             
             # increment for private and protected attributes
             if attr_type_private is not None or attr_type_protected is not None:
-                self.__number_of_private_attrs += 1
-    
+                self.last_number_of_private_attrs += 1
+                
 
 if __name__ == "__main__":
     walker = ParseTreeWalker()
@@ -147,10 +116,9 @@ if __name__ == "__main__":
     parser = JavaParserLabeled(token_stream)
     parse_tree = parser.compilationUnit()
 
-    listener = encapsulationListener(class_name="DemoClass")
+    listener = encapsulationListener()
     walker.walk(t=parse_tree, listener=listener)
-    print("DemoClass DAM =", listener.get_DAM_ratio())
-
-    listener = encapsulationListener(class_name="TestClass")
-    walker.walk(t=parse_tree, listener=listener)
-    print("TestClass DAM =", listener.get_DAM_ratio())
+    
+    print(listener.get_DAM_ratio())
+    
+    
