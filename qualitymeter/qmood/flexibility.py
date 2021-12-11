@@ -22,12 +22,12 @@ class encapsulationListener(JavaParserLabeledListener):
         Returns:
             None
         """
-
-        self.__number_of_private_attrs = 0
-        self.__number_of_total_attrs = 0
+        
         self.__class_name = None
         self.total_classes = {}
         self.last_number_of_private_attrs = 0
+        self.__is_entered_class = False
+        self.__entered_nested_class = False
 
     def get_DAM_ratio(self):
         """
@@ -59,9 +59,29 @@ class encapsulationListener(JavaParserLabeledListener):
             None
         """
 	    
-        self.__class_name = ctx.IDENTIFIER().getText()
-        self.total_classes[self.__class_name] = (0, 0)
-
+        # ignore classes inside another class
+        if not self.__is_entered_class:
+            self.__class_name = ctx.IDENTIFIER().getText()
+            self.total_classes[self.__class_name] = (0, 0)
+            self.__is_entered_class = True
+            self.__entered_nested_class = False
+        else:
+            self.__entered_nested_class = True
+		    
+    def exitClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
+        """
+        This method ensures that we have left the intended class,
+        as this method is called once the walker is leaving a class in the source code.
+        Args:
+            ClassDeclaration Context
+        Returns:
+            None
+        """
+        
+        if not self.__entered_nested_class:
+            self.__is_enter_class = False
+            self.__entered_nested_class = False
+		
     def enterFieldDeclaration(self, ctx:JavaParserLabeled.FieldDeclarationContext):
         """
         This method counts the number of attributes, whether it be private, public, or protected.
@@ -74,10 +94,11 @@ class encapsulationListener(JavaParserLabeledListener):
             None
         """
 
-        prv_attrs, tot_attrs = self.total_classes[self.__class_name]
-        prv_attrs = prv_attrs + self.last_number_of_private_attrs
-        tot_attrs = tot_attrs + 1
-        self.total_classes[self.__class_name] = (prv_attrs, tot_attrs)
+        if not self.__entered_nested_class:
+            prv_attrs, tot_attrs = self.total_classes[self.__class_name]
+            prv_attrs = prv_attrs + self.last_number_of_private_attrs
+            tot_attrs = tot_attrs + 1
+            self.total_classes[self.__class_name] = (prv_attrs, tot_attrs)
 
     def enterClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
         """
@@ -91,26 +112,27 @@ class encapsulationListener(JavaParserLabeledListener):
             None
         """
 
-        prv_attrs, tot_attrs = self.total_classes[self.__class_name]
-        self.last_number_of_private_attrs = 0
+        if not self.__entered_nested_class:
+            prv_attrs, tot_attrs = self.total_classes[self.__class_name]
+            self.last_number_of_private_attrs = 0
 
-        modifier_list = ctx.modifier()
-        # check if we are in the intented class and it has any defined attributes 
-        if len(modifier_list) > 0:
-            # getting the name of the private attribute, returns None is there is no private attribute
-            attr_type_private = modifier_list[0].classOrInterfaceModifier().PRIVATE()
-            # getting the name of the protected attribute, returns None is there is no protected attribute
-            attr_type_protected = modifier_list[0].classOrInterfaceModifier().PROTECTED()
-            
-            # increment for private and protected attributes
-            if attr_type_private is not None or attr_type_protected is not None:
-                self.last_number_of_private_attrs += 1
+            modifier_list = ctx.modifier()
+            # check if we are in the intented class and it has any defined attributes 
+            if len(modifier_list) > 0:
+                # getting the name of the private attribute, returns None is there is no private attribute
+                attr_type_private = modifier_list[0].classOrInterfaceModifier().PRIVATE()
+                # getting the name of the protected attribute, returns None is there is no protected attribute
+                attr_type_protected = modifier_list[0].classOrInterfaceModifier().PROTECTED()
+                
+                # increment for private and protected attributes
+                if attr_type_private is not None or attr_type_protected is not None:
+                    self.last_number_of_private_attrs += 1
                 
 
 if __name__ == "__main__":
     walker = ParseTreeWalker()
 
-    stream = FileStream("test.java", encoding="utf-8")
+    stream = FileStream("/home/funlife/Downloads/ClassViewer.java", encoding="utf-8")
     lexer = JavaLexer(stream)
     token_stream = CommonTokenStream(lexer)
     parser = JavaParserLabeled(token_stream)
