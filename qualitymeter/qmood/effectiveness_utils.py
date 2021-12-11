@@ -14,6 +14,7 @@ class InfoExtractorListener(JavaParserLabeledListener):
         """
         Create a new InfoExtractorListener to use with ANTLR tree walker.
         """
+        self.__is_enum = False
         self.__user_defined = set()
         self.__class_info = None  # the class which is currently being walked
         self.__class_stack = []  # list of seen classes
@@ -59,8 +60,14 @@ class InfoExtractorListener(JavaParserLabeledListener):
 
     def enterEnumDeclaration(self, ctx: JavaParserLabeled.EnumDeclarationContext):
         self.__user_defined.add(ctx.IDENTIFIER().getText())
+        self.__is_enum = True
+
+    def exitEnumDeclaration(self, ctx:JavaParserLabeled.EnumDeclarationContext):
+        self.__is_enum = False
 
     def enterMemberDeclaration0(self, ctx: JavaParserLabeled.MemberDeclaration0Context):
+        if self.__is_enum:
+            return
         self.__class_info['method_count'] += 1
         inheritablef = True
         finalf = False
@@ -76,6 +83,8 @@ class InfoExtractorListener(JavaParserLabeledListener):
                 self.__class_info['final_method_count'] += 1
 
     def enterMemberDeclaration2(self, ctx: JavaParserLabeled.MemberDeclaration2Context):
+        if self.__is_enum:
+            return
         self.__class_info['total_field'] += 1
         for i in ctx.parentCtx.modifier():
             text = i.getText()
