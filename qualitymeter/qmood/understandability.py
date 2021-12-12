@@ -143,12 +143,18 @@ class Understandability(WalkerCreator):
         :return: results
         """
 
-        polymorphic_methods = 0
+        result = 0
         for cls in self.classes:
             if len(cls.implementations) != 0:
-                polymorphic_methods += len(cls.methods)
+                for im in cls.implementations:
+                    implementation = self.find_implementation(im)
+                    if implementation:
+                        implementation_methods = [x.identifier.getText() for x in implementation.methods]
+                        methods = [x.identifier.getText() for x in cls.methods]
+                        res = intersection(methods, implementation_methods)
+                        result += len(res)
 
-        return polymorphic_methods
+        return result
 
     def calc_complexity(self):
         """

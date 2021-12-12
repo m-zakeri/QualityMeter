@@ -6,13 +6,16 @@ Class MyListener -> here we extract all the design metrics needed to calculate
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.java_components.java_class import JavaClass
+from qualitymeter.java_components.java_interface import JavaInterface
 
 
 class Listener(JavaParserLabeledListener):
 
     def __init__(self):
         self.__classes = []
+        self.__interfaces = []
         self.__currentClass = None
+        self.__currentInterface = None
         self.__currentMethod = None
         self.__currentMethodParametersType = []
         self.__currentMethodParameters = []
@@ -24,6 +27,10 @@ class Listener(JavaParserLabeledListener):
     @property
     def classes(self):
         return self.__classes
+
+    @property
+    def interfaces(self):
+        return self.__interfaces
 
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
         """
@@ -82,8 +89,9 @@ class Listener(JavaParserLabeledListener):
                 if i.classOrInterfaceModifier():
                     self.__currentMethodModifiers.append(i.classOrInterfaceModifier().getText())
                     if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
-                        if isinstance(ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
-                                      JavaParserLabeled.FormalParameterList0Context):
+                        if isinstance(
+                                ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                                JavaParserLabeled.FormalParameterList0Context):
                             for p in ctx.memberDeclaration().methodDeclaration(). \
                                     formalParameters().formalParameterList().formalParameter():
                                 self.__currentMethodParametersType.append(p.typeType().getText())
@@ -130,3 +138,13 @@ class Listener(JavaParserLabeledListener):
         """
         if self.__is_enter_method:
             self.__currentMethodVariables.append(ctx.IDENTIFIER().getText())
+
+    def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
+        self.__currentInterface = JavaInterface(ctx.IDENTIFIER())
+
+    def enterInterfaceMethodDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
+        self.__currentInterface.add_method(ctx.IDENTIFIER())
+
+    def exitInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
+        self.__interfaces.append(self.__currentInterface)
+        self.__currentInterface = None

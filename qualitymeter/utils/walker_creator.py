@@ -13,6 +13,8 @@ from qualitymeter.listener.listener import Listener
 class WalkerCreator:
     def __init__(self, streams):
         self.classes = []
+        self.interfaces = []
+        self.classOrInterface = []
 
         for stream in streams:
             # Create lexer from data stream.
@@ -29,9 +31,22 @@ class WalkerCreator:
             walker = ParseTreeWalker()
             # Walk the tree.
             walker.walk(listener, parse_tree)
-            # Save the tree's classes
-            for cls in listener.classes:
-                self.classes.append(cls)
+            # Save the tree's classes and interfaces
+            self.classes += listener.classes
+            self.interfaces += listener.interfaces
+        self.classOrInterface = self.classes + self.interfaces
 
     def find_parent(self, parent):
         return [cls for cls in self.classes if cls.identifier.getText() == parent.identifier]
+
+    def find_implementation(self, implementation):
+        for clf in self.classOrInterface:
+            if clf.identifier.getText() == implementation.identifier.getText():
+                return clf
+
+    def intersection(self, lst1, lst2):
+        # Use of hybrid method
+        temp = set(lst2)
+        lst3 = [value for value in lst1 if value in temp]
+        return lst3
+

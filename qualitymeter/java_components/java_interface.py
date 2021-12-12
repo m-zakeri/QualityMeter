@@ -1,7 +1,7 @@
 """
 Class for storing java class Interface.
 """
-from javaComponents.java_method import JavaMethod
+from .java_method import JavaMethod
 
 
 class JavaInterface:
@@ -13,6 +13,10 @@ class JavaInterface:
     def identifier(self):
         return self.__identifier
 
-    def add_method(self, identifier, parameters, modifier):
-        method = JavaMethod(identifier, parameters, modifier)
+    @property
+    def methods(self):
+        return self.__methods
+
+    def add_method(self, identifier):
+        method = JavaMethod(identifier)
         self.__methods.append(method)

@@ -4,7 +4,7 @@ Java Method component
 
 
 class JavaMethod:
-    def __init__(self, identifier, parameters_type, parameters, modifiers, variables):
+    def __init__(self, identifier, parameters_type=[], parameters=[], modifiers=[], variables=[]):
         self.__identifier = identifier
         self.__parameters_type = parameters_type
         self.__parameters = parameters
