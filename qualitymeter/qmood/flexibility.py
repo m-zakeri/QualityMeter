@@ -4,6 +4,7 @@ from antlr4 import *
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
+import os
 
 
 class encapsulationListener(JavaParserLabeledListener):
@@ -127,20 +128,39 @@ class encapsulationListener(JavaParserLabeledListener):
                 # increment for private and protected attributes
                 if attr_type_private is not None or attr_type_protected is not None:
                     self.last_number_of_private_attrs += 1
+        
                 
+def get_all_filenames(walk_dir, valid_extensions):
+    for root, subdirs, files in os.walk(walk_dir):
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            if any([filename.endswith(extension) for extension in valid_extensions]) and "test" not in file_path:
+                yield file_path
 
-if __name__ == "__main__":
+
+def get_DAM_metric(walk_dir, valid_extensions):
     walker = ParseTreeWalker()
 
-    stream = FileStream("/home/funlife/Downloads/ClassViewer.java", encoding="utf-8")
-    lexer = JavaLexer(stream)
-    token_stream = CommonTokenStream(lexer)
-    parser = JavaParserLabeled(token_stream)
-    parse_tree = parser.compilationUnit()
+    metric_values = []
+    for filename in get_all_filenames(walk_dir, valid_extensions):
+        stream = FileStream(filename, encoding="utf-8")
+        lexer = JavaLexer(stream)
+        token_stream = CommonTokenStream(lexer)
+        parser = JavaParserLabeled(token_stream)
+        parse_tree = parser.compilationUnit()
 
-    listener = encapsulationListener()
-    walker.walk(t=parse_tree, listener=listener)
+        listener = encapsulationListener()
+        walker.walk(t=parse_tree, listener=listener)
+        
+        metric_values.append(listener.get_DAM_ratio())
+        
+    return sum(metric_values) / len(metric_values)
+
+if __name__ == "__main__":
+    walk_dir = "path_to_target_project_directory"
+    valid_extensions = [".java"]
     
-    print(listener.get_DAM_ratio())
+    value = get_DAM_metric(walk_dir, valid_extensions)
+    print(value)
     
     
