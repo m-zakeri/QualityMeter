@@ -151,7 +151,7 @@ class Understandability(WalkerCreator):
                     if implementation:
                         implementation_methods = [x.identifier.getText() for x in implementation.methods]
                         methods = [x.identifier.getText() for x in cls.methods]
-                        res = intersection(methods, implementation_methods)
+                        res = self.intersection(methods, implementation_methods)
                         result += len(res)
 
         return result

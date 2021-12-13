@@ -41,8 +41,11 @@ class WalkerCreator:
 
     def find_implementation(self, implementation):
         for clf in self.classOrInterface:
-            if clf.identifier.getText() == implementation.identifier.getText():
-                return clf
+            if implementation and clf:
+                if clf.identifier.getText() == implementation.identifier.getText():
+                    return clf
+
+
 
     def intersection(self, lst1, lst2):
         # Use of hybrid method

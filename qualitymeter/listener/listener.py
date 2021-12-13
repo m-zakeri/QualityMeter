@@ -74,34 +74,35 @@ class Listener(JavaParserLabeledListener):
         :param ctx:
         :return:
         """
-        if isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration2Context):
-            field_dec = ctx.memberDeclaration().fieldDeclaration()
-            for varDec in field_dec.variableDeclarators().variableDeclarator():
+        if self.__currentClass:
+            if isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration2Context):
+                field_dec = ctx.memberDeclaration().fieldDeclaration()
+                for varDec in field_dec.variableDeclarators().variableDeclarator():
+                    for i in ctx.modifier():
+                        if i.classOrInterfaceModifier():
+                            self.__currentAttributesModifiers.append(i.classOrInterfaceModifier().getText())
+                    self.__currentClass.add_attribute(field_dec.typeType().getText(),
+                                                      varDec.variableDeclaratorId().IDENTIFIER(),
+                                                      self.__currentAttributesModifiers)
+
+            elif isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context):
                 for i in ctx.modifier():
                     if i.classOrInterfaceModifier():
-                        self.__currentAttributesModifiers.append(i.classOrInterfaceModifier().getText())
-                self.__currentClass.add_attribute(field_dec.typeType().getText(),
-                                                  varDec.variableDeclaratorId().IDENTIFIER(),
-                                                  self.__currentAttributesModifiers)
+                        self.__currentMethodModifiers.append(i.classOrInterfaceModifier().getText())
+                        if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
+                            if isinstance(
+                                    ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                                    JavaParserLabeled.FormalParameterList0Context):
+                                for p in ctx.memberDeclaration().methodDeclaration(). \
+                                        formalParameters().formalParameterList().formalParameter():
+                                    self.__currentMethodParametersType.append(p.typeType().getText())
+                                    self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
+                            # if isinstance(
+                            #         ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                            #         JavaParserLabeled.FormalParameterList1Context):
+                            #     # print("FormalParameterList1Context")
 
-        elif isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context):
-            for i in ctx.modifier():
-                if i.classOrInterfaceModifier():
-                    self.__currentMethodModifiers.append(i.classOrInterfaceModifier().getText())
-                    if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
-                        if isinstance(
-                                ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
-                                JavaParserLabeled.FormalParameterList0Context):
-                            for p in ctx.memberDeclaration().methodDeclaration(). \
-                                    formalParameters().formalParameterList().formalParameter():
-                                self.__currentMethodParametersType.append(p.typeType().getText())
-                                self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
-                        # if isinstance(
-                        #         ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
-                        #         JavaParserLabeled.FormalParameterList1Context):
-                        #     # print("FormalParameterList1Context")
-
-            self.__currentMethod = ctx.memberDeclaration().methodDeclaration().IDENTIFIER()
+                self.__currentMethod = ctx.memberDeclaration().methodDeclaration().IDENTIFIER()
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         """
@@ -117,11 +118,12 @@ class Listener(JavaParserLabeledListener):
         :param ctx:
         :return:
         """
-        self.__currentClass.add_method(self.__currentMethod,
-                                       self.__currentMethodParametersType,
-                                       self.__currentMethodParameters,
-                                       self.__currentMethodModifiers,
-                                       self.__currentMethodVariables)
+        if self.__currentMethod:
+            self.__currentClass.add_method(self.__currentMethod,
+                                           self.__currentMethodParametersType,
+                                           self.__currentMethodParameters,
+                                           self.__currentMethodModifiers,
+                                           self.__currentMethodVariables)
         self.__currentMethod = None
         self.__currentMethodParametersType = []
         self.__currentMethodParameters = []
@@ -143,7 +145,8 @@ class Listener(JavaParserLabeledListener):
         self.__currentInterface = JavaInterface(ctx.IDENTIFIER())
 
     def enterInterfaceMethodDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
-        self.__currentInterface.add_method(ctx.IDENTIFIER())
+        if self.__currentInterface:
+            self.__currentInterface.add_method(ctx.IDENTIFIER())
 
     def exitInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
         self.__interfaces.append(self.__currentInterface)
