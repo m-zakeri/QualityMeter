@@ -77,7 +77,6 @@ class PolymorphismListener(JavaParserLabeledListener):
 
         methodModifier = self.classModifierStack[-1]
         self.classModifierStack.pop()
-
         # a method may be out of a class, in an enum for example. we only care about methods inside a class.
         if not self.currentClass:
             return

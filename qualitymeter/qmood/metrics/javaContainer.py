@@ -43,3 +43,6 @@ class JavaInterfaceContaienr:
     def javaInterfaceList(self):
         for _, javaInterface in self.container.items():
             yield javaInterface
+
+    def getSize(self):
+        return len(self.container)

@@ -72,3 +72,6 @@ class JavaMethod:
 
     def setModifier(self, modifier):
         self.modifier = modifier
+
+    def getModifier(self):
+        return self.modifier

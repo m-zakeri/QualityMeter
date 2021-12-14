@@ -92,24 +92,32 @@ class Polymorphism:
 
 
     def calcPolymorphism(self):
-        countOverLoaded = 0
+        totalMethodsCanBeOverriden = 0
         for javaClass in self.javaClassContainer.javaClassList():
+            inheritedMethods = javaClass.getInheritedMethodList()
             for method in javaClass.methodList():
-                found = False
-                for interface in javaClass.interfaceObjectList():
-                    if interface.hasMethod(method):
-                        found = True
+                isInherited = False
+                for iMethod in inheritedMethods:
+                    if iMethod == method:
+                        isInherited = True
                         break
+                if not isInherited and not(method.getModifier().isPrivate() or method.getModifier().isFinal()):
+                    totalMethodsCanBeOverriden += 1
 
-                if not found:
-                    for parentClass in javaClass.parentObjectList():
-                        if parentClass.hasMethod(method):
-                            found = True
-                            break
+        for javaInterface in self.javaInterfaceContainer.javaInterfaceList():
+            inheritedMethods = javaInterface.getInheritedMethodList()
+            for method in javaInterface.methodList():
+                isInherited = False
+                for iMethod in inheritedMethods:
+                    if iMethod == method:
+                        isInherited = True
+                        break
+                if not isInherited:
+                    totalMethodsCanBeOverriden += 1
 
-                if found:
-                    countOverLoaded += 1
-        return countOverLoaded
+        if self.javaClassContainer.getSize() == 0:
+            return 0
+        return totalMethodsCanBeOverriden / self.javaClassContainer.getSize()
 
     def calcInheritence(self):
         sumMetricForClasses = 0
