@@ -1,6 +1,6 @@
 package A;
 
-class A1 {
+class A1 extends A0 {
     private int x;
     private int y;
 

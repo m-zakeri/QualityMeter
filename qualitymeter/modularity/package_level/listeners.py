@@ -43,6 +43,10 @@ class NodeGeneratorListener(JavaParserLabeledListener):
         node = Node(ctx.IDENTIFIER().getText(), self.__current_package)
         self.graph.add_node(node, key=str(node))
 
+    def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceDeclarationContext):
+        node = Node(ctx.IDENTIFIER().getText(), self.__current_package)
+        self.graph.add_node(node, key=str(node))
+
 
 class OutputListener(JavaParserLabeledListener):
     """
@@ -68,6 +72,12 @@ class OutputListener(JavaParserLabeledListener):
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
         self.__current_class = ctx.IDENTIFIER().getText()
 
+        if ctx.typeType():  # extends
+            self.add_edge(ctx.typeType())
+        if ctx.typeList():  # implements
+            for t in ctx.typeList().typeType():
+                self.add_edge(t)
+
     def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceDeclarationContext):
         self.__current_class = ctx.IDENTIFIER().getText()
 
@@ -91,7 +101,7 @@ class OutputListener(JavaParserLabeledListener):
         if not class_or_interface:
             return
         associated_class = class_or_interface.IDENTIFIER(0).getText()
-        if associated_class and associated_class != self.__current_class:
+        if associated_class:
             node1 = self.find_node(self.__current_class, [self.__current_package])
             node2 = self.find_node(associated_class, self.__imported_packages[self.__current_package])
             if self.__graph.has_edge(node1, node2):

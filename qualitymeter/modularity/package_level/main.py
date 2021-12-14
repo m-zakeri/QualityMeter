@@ -3,7 +3,7 @@ import os
 import sys
 import glob
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import networkx as nx
 from antlr4 import FileStream, CommonTokenStream, ParseTreeWalker
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
@@ -41,38 +41,39 @@ def main(args):
         for filename in glob.iglob(directory + '**/*.java', recursive=True):
             process_file(filename, listener)
 
-    edges = []
-    for edge in list(graph.edges):
-        node1, node2 = edge
-        weight = graph.edges.get(edge).get("weight")
-        edges.append((node1, node2, weight))
-
-    q_value = calculate_q(edges)
+    q_value = calculate_q(graph)
     # plt.title(f"Q value = {q_value}")
     # labels = nx.get_edge_attributes(graph, 'weight')
     # pos = nx.spring_layout(graph)
     # nx.draw_networkx(graph, pos)
     # nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels)
     # plt.show()
+    print("[N] =", len(graph.nodes))
+    print("[E] =", len(graph.edges))
     print("Q of this project equals to: ", q_value)
 
 
-def calculate_q(edges):
-    m = 0
-    lst = []
-    for edge in edges:
-        node1, node2, weight = edge
-        node1.k = getattr(node1, "k", 0) + weight
-        node2.k = getattr(node2, "k", 0) + weight
-        m += weight
+def calculate_q(graph):
+    two_m = 0
+    for node1 in graph.nodes:
+        node1.k = 0
+        for node2 in graph.nodes:
+            if graph.has_edge(node1, node2):
+                weight = graph.edges.get((node1, node2)).get("weight")
+                node1.k += weight
+                two_m += weight  # 2m
 
     tmp = 0
-    for edge in edges:
-        node1, node2, weight = edge
-        if node1.package_name == node2.package_name:
-            tmp += (weight - (node1.k * node2.k) / (2 * m))
+    for node1 in graph.nodes:
+        for node2 in graph.nodes:
+            if node1.package_name == node2.package_name:
+                if graph.has_edge(node1, node2):
+                    weight = graph.edges.get((node1, node2)).get("weight")
+                else:
+                    weight = 0
+                tmp += (weight - (node1.k * node2.k) / two_m)
 
-    return round((1 / (2 * m)) * tmp, 4)
+    return round(tmp / two_m, 4)  # Q
 
 
 if __name__ == "__main__":
