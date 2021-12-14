@@ -143,16 +143,26 @@ class Understandability(WalkerCreator):
         :return: results
         """
 
-        result = 0
+        polymorphic_methods = []
         for cls in self.classes:
-            if len(cls.implementations) != 0:
-                for im in cls.implementations:
-                    implementation = self.find_implementation(im)
-                    if implementation:
-                        implementation_methods = [x.identifier.getText() for x in implementation.methods]
-                        methods = [x.identifier.getText() for x in cls.methods]
-                        res = self.intersection(methods, implementation_methods)
-                        result += len(res)
+            polymorphic = 0
+            if cls:
+                for clmt in cls.methods:
+                    if "private" not in clmt.modifiers and "final" not in clmt.modifiers:
+                        polymorphic += 1
+                polymorphic_methods.append(polymorphic)
+
+        for inf in self.interfaces:
+            polymorphic = 0
+            if inf:
+                for _ in inf.methods:
+                    polymorphic += 1
+                polymorphic_methods.append(polymorphic)
+
+        if len(polymorphic_methods) != 0:
+            result = sum(polymorphic_methods) / len(polymorphic_methods)
+        else:
+            result = 0
 
         return result
 
