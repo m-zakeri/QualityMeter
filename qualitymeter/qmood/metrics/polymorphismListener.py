@@ -10,6 +10,7 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeled import *
 from .javaInterface import JavaInterface
 from .javaClass import JavaClass
 from .javaMethod import JavaMethod
+from .javaModifier import JavaModifier
 
 
 class PolymorphismListener(JavaParserLabeledListener):
@@ -20,10 +21,12 @@ class PolymorphismListener(JavaParserLabeledListener):
         self.currentClass = None
         self.currentInterface = None
 
+        self.classModifierStack = []
         self.classStack = []
         self.interFaceStack = []
 
     def getClassList(self):
+        assert(len(self.classModifierStack) == 0)
         return self.classList
 
     def getInterfaceList(self):
@@ -40,7 +43,6 @@ class PolymorphismListener(JavaParserLabeledListener):
                 for token in interface.classOrInterfaceType().IDENTIFIER():
                     self.currentClass.addInterface(token.getText())
 
-
         self.classList.append(self.currentClass)
         self.classStack.append(self.currentClass)
 
@@ -51,13 +53,38 @@ class PolymorphismListener(JavaParserLabeledListener):
         else:
             self.currentClass = None
 
+    def enterClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
+        # we only care about method modifiers of classes and interfaces
+        if not (
+            isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context)
+            or isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration1Context)
+        ):
+            return
+
+        modifier = JavaModifier()
+        for m in ctx.modifier():
+            if m.classOrInterfaceModifier():
+                if m.classOrInterfaceModifier().PRIVATE():
+                    modifier.setPrivateFlag(True)
+                if m.classOrInterfaceModifier().FINAL():
+                    modifier.setFinalFlag(True)
+
+        self.classModifierStack.append(modifier)
+
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+        if not self.classModifierStack:
+            raise Exception("modifier stack for method is empty. this should not happen")
+
+        methodModifier = self.classModifierStack[-1]
+        self.classModifierStack.pop()
+
         # a method may be out of a class, in an enum for example. we only care about methods inside a class.
         if not self.currentClass:
             return
 
         javaMethod = JavaMethod(ctx.IDENTIFIER().getText())
         javaMethod.setParameterList(ctx.formalParameters().formalParameterList())
+        javaMethod.setModifier(methodModifier)
         self.currentClass.addMethod(javaMethod)
 
     def enterInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):

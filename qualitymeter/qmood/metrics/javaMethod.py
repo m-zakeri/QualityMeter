@@ -69,3 +69,6 @@ class JavaMethod:
             if parameter[0] != parameter[1]:
                 return False
         return True
+
+    def setModifier(self, modifier):
+        self.modifier = modifier
