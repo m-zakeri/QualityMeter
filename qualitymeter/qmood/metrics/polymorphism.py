@@ -112,8 +112,7 @@ class Polymorphism:
         return countOverLoaded
 
     def calcInheritence(self):
-        totalCountInherited = 0
-        totalCountMethods = 0
+        sumMetricForClasses = 0
         for javaClass in self.javaClassContainer.javaClassList():
             inheritedMethods = javaClass.getInheritedMethodList()
             countInherited = len(inheritedMethods)
@@ -128,9 +127,9 @@ class Polymorphism:
                 if not isOverriden:
                     countMethods += 1
 
-            totalCountInherited += countInherited
-            totalCountMethods += countMethods
+            if countMethods != 0:
+                sumMetricForClasses += countInherited / countMethods
 
-        if totalCountMethods == 0:
+        if self.javaClassContainer.getSize() == 0:
             return 0
-        return totalCountInherited / totalCountMethods
+        return sumMetricForClasses / self.javaClassContainer.getSize()
