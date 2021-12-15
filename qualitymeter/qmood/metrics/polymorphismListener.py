@@ -23,6 +23,8 @@ class PolymorphismListener(JavaParserLabeledListener):
 
         self.classModifierStack = []
         self.classStack = []
+
+        self.interfaceModifierStack = []
         self.interFaceStack = []
 
     def getClassList(self):
@@ -97,6 +99,23 @@ class PolymorphismListener(JavaParserLabeledListener):
         self.interfaceList.append(self.currentInterface)
         self.interFaceStack.append(self.currentInterface)
 
+    def enterInterfaceBodyDeclaration(self, ctx:JavaParserLabeled.InterfaceBodyDeclarationContext):
+        # we only care about modifiers of methods in interfaces
+        if not isinstance(ctx.interfaceMemberDeclaration(), JavaParserLabeled.InterfaceMemberDeclaration1Context):
+            return
+        modifier = JavaModifier()
+        for m in ctx.modifier():
+            if m.classOrInterfaceModifier().PRIVATE():
+                modifier.setPrivateFlag(True)
+            if m.classOrInterfaceModifier().FINAL():
+                modifier.setFinalFlag(True)
+            if m.classOrInterfaceModifier().STATIC():
+                modifier.setStaticFlag(True)
+
+        self.interfaceModifierStack.append(modifier)
+        assert(len(self.interfaceModifierStack) <= 1)
+
+
     def exitInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
         self.interFaceStack.pop()
         if self.interFaceStack:
@@ -105,6 +124,12 @@ class PolymorphismListener(JavaParserLabeledListener):
             self.currentInterface = None
 
     def enterInterfaceMethodDeclaration(self, ctx:JavaParserLabeled.InterfaceMethodDeclarationContext):
+        if not self.interfaceModifierStack:
+            raise Exception("modifier stack for method is empty. this should not happen")
+        methodModifier = self.interfaceModifierStack[-1]
+        self.interfaceModifierStack.pop()
+
         javaMethod = JavaMethod(ctx.IDENTIFIER().getText())
         javaMethod.setParameterList(ctx.formalParameters().formalParameterList())
+        javaMethod.setModifier(methodModifier)
         self.currentInterface.addMethod(javaMethod)

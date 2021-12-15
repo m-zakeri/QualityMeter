@@ -116,15 +116,19 @@ class Polymorphism:
                     if iMethod == method:
                         isInherited = True
                         break
-                if not isInherited:
+                if not isInherited and not(
+                    method.getModifier().isPrivate()
+                    or method.getModifier().isFinal()
+                    or method.getModifier().isStatic()
+                ):
                     totalMethodsCanBeOverriden += 1
 
-        if self.javaClassContainer.getSize() == 0:
+        if self.javaClassContainer.getSize() == 0 and self.javaInterfaceContainer.getSize():
             return 0
-        return totalMethodsCanBeOverriden / self.javaClassContainer.getSize()
+        return totalMethodsCanBeOverriden / (self.javaClassContainer.getSize() + self.javaInterfaceContainer.getSize())
 
     def calcInheritence(self):
-        sumMetricForClasses = 0
+        sumMetricForClassAndInterface = 0
         for javaClass in self.javaClassContainer.javaClassList():
             inheritedMethods = javaClass.getInheritedMethodList()
             countInherited = len(inheritedMethods)
@@ -140,8 +144,25 @@ class Polymorphism:
                     countMethods += 1
 
             if countMethods != 0:
-                sumMetricForClasses += countInherited / countMethods
+                sumMetricForClassAndInterface += countInherited / countMethods
 
-        if self.javaClassContainer.getSize() == 0:
+        for javaInterface in self.javaInterfaceContainer.javaInterfaceList():
+            inheritedMethods = javaInterface.getInheritedMethodList()
+            countInherited = len(inheritedMethods)
+            countMethods = countInherited
+
+            for method in javaInterface.methodList():
+                isOverriden = False
+                for iMethod in inheritedMethods:
+                    if iMethod == method:
+                        isOverriden = True
+                        break
+                if not isOverriden:
+                    countMethods += 1
+
+            if countMethods != 0:
+                sumMetricForClassAndInterface += countInherited / countMethods
+
+        if self.javaClassContainer.getSize() == 0 and self.javaInterfaceContainer.getSize() == 0:
             return 0
-        return sumMetricForClasses / self.javaClassContainer.getSize()
+        return sumMetricForClassAndInterface / (self.javaClassContainer.getSize() + self.javaInterfaceContainer.getSize())
