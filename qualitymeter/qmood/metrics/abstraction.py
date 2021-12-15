@@ -71,6 +71,10 @@ class Abstraction:
             ancestors = javaClass.getAllParents()
             totalNumberOfAncestors += len(ancestors)
 
-        if self.classContainer.getSize() == 0:
+        for javaInterface in self.interfaceContainer.javaInterfaceList():
+            ancestors = javaInterface.getAllParents()
+            totalNumberOfAncestors += len(ancestors)
+
+        if self.classContainer.getSize() == 0 and self.interfaceContainer.getSize() == 0:
             return 0
-        return totalNumberOfAncestors / self.classContainer.getSize()
+        return totalNumberOfAncestors / (self.classContainer.getSize() + self.interfaceContainer.getSize())
