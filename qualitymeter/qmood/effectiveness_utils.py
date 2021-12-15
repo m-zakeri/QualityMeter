@@ -51,9 +51,28 @@ class InfoExtractorListener(JavaParserLabeledListener):
             self.__class_info['DAM'] = 1
         else:
             self.__class_info['DAM'] = self.__class_info['private_field'] / self.__class_info['total_field']
+
         if not ctx.EXTENDS():
-            self.__class_info['NOP'] = len(self.__class_info['inheritable_methods']) - self.__class_info[
-                'final_method_count']
+            # Handling final classes
+            parent_tmp = ctx.parentCtx
+            finalf = False
+            if isinstance(parent_tmp, JavaParserLabeled.TypeDeclarationContext):
+                for i in ctx.parentCtx.classOrInterfaceModifier():
+                    if i.getText() == 'final':
+                        finalf = True
+                        break
+            elif isinstance(parent_tmp, JavaParserLabeled.MemberDeclaration7Context):
+                for i in ctx.parentCtx.parentCtx.modifier():
+                    if i.getText() == 'final':
+                        finalf = True
+                        break
+
+            if finalf:
+                self.__class_info['NOP'] = 0
+            else:
+                self.__class_info['NOP'] = len(self.__class_info['inheritable_methods']) - self.__class_info[
+                    'final_method_count']
+
         self.__depth -= 1
         self.__current_pointer = self.__stack_pointers.pop()
         self.__class_info = self.__class_stack[self.__current_pointer]
