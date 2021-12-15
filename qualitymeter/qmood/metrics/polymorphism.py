@@ -101,7 +101,11 @@ class Polymorphism:
                     if iMethod == method:
                         isInherited = True
                         break
-                if not isInherited and not(method.getModifier().isPrivate() or method.getModifier().isFinal()):
+                if not isInherited and not(
+                    method.getModifier().isPrivate()
+                    or method.getModifier().isFinal()
+                    or method.getModifier().isStatic()
+                ):
                     totalMethodsCanBeOverriden += 1
 
         for javaInterface in self.javaInterfaceContainer.javaInterfaceList():

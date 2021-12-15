@@ -54,7 +54,7 @@ class PolymorphismListener(JavaParserLabeledListener):
             self.currentClass = None
 
     def enterClassBodyDeclaration2(self, ctx:JavaParserLabeled.ClassBodyDeclaration2Context):
-        # we only care about method modifiers of classes and interfaces
+        # we only care about method modifiers of classes
         if not (
             isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context)
             or isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration1Context)
@@ -68,6 +68,8 @@ class PolymorphismListener(JavaParserLabeledListener):
                     modifier.setPrivateFlag(True)
                 if m.classOrInterfaceModifier().FINAL():
                     modifier.setFinalFlag(True)
+                if m.classOrInterfaceModifier().STATIC():
+                    modifier.setStaticFlag(True)
 
         self.classModifierStack.append(modifier)
 
