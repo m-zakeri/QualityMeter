@@ -26,13 +26,21 @@ class CouplingListener(JavaParserLabeledListener):
     def enterInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
         self.numInterfaces += 1
 
+    # covering local variable declaration
     def enterLocalVariableDeclaration(self, ctx:JavaParserLabeled.LocalVariableDeclarationContext):
         if ctx.typeType().classOrInterfaceType():
             for token in ctx.typeType().classOrInterfaceType().IDENTIFIER():
                 self.list.append(token.getText())
 
+    # covering new expressions
     def enterExpression4(self, ctx:JavaParserLabeled.Expression4Context):
         # we only count non-primitive new expressions
         if ctx.NEW() and isinstance(ctx.creator().createdName(), JavaParserLabeled.CreatedName0Context):
             for token in ctx.creator().createdName().IDENTIFIER():
+                self.list.append(token.getText())
+
+    # covering parameters
+    def enterFormalParameter(self, ctx: JavaParserLabeled.FormalParameterContext):
+        if ctx.typeType().classOrInterfaceType():
+            for token in ctx.typeType().classOrInterfaceType().IDENTIFIER():
                 self.list.append(token.getText())
