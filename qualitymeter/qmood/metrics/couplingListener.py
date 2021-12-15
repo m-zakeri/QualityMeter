@@ -4,6 +4,8 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLab
 class CouplingListener(JavaParserLabeledListener):
     def __init__(self):
         self.list = []
+        self.numClasses = 0
+        self.numInterfaces = 0
 
     def get_coupling_size(self):
         unique_items = []
@@ -12,12 +14,25 @@ class CouplingListener(JavaParserLabeledListener):
                 unique_items.append(item)
         return len(unique_items)
 
-    def enterLocalTypeDeclaration(self, ctx:JavaParserLabeled.LocalTypeDeclarationContext):
-        for token in ctx.IDENTIFIER():
-            self.list.append(token.getText())
+    def getNumClasses(self):
+        return self.numClasses
+
+    def getNumInterfaces(self):
+        return self.numInterfaces
+
+    def enterClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
+        self.numClasses += 1
+
+    def enterInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
+        self.numInterfaces += 1
 
     def enterLocalVariableDeclaration(self, ctx:JavaParserLabeled.LocalVariableDeclarationContext):
         if ctx.typeType().classOrInterfaceType():
             for token in ctx.typeType().classOrInterfaceType().IDENTIFIER():
                 self.list.append(token.getText())
 
+    def enterExpression4(self, ctx:JavaParserLabeled.Expression4Context):
+        # we only count non-primitive new expressions
+        if ctx.NEW() and isinstance(ctx.creator().createdName(), JavaParserLabeled.CreatedName0Context):
+            for token in ctx.creator().createdName().IDENTIFIER():
+                self.list.append(token.getText())

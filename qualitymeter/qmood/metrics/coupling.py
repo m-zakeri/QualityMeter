@@ -22,7 +22,13 @@ class Coupling:
 
     def calcCoupling(self):
         countCoupling = 0
+        totalNumClassesAndInterfaces = 0
         for stream in FileReader.getFileStreams(self.projectPath):
             listener = self.getListener(stream)
             countCoupling += listener.get_coupling_size()
-        return countCoupling
+            totalNumClassesAndInterfaces += listener.getNumClasses()
+            totalNumClassesAndInterfaces += listener.getNumInterfaces()
+
+        if totalNumClassesAndInterfaces == 0:
+            return 0
+        return countCoupling / totalNumClassesAndInterfaces
