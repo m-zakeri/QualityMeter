@@ -14,155 +14,157 @@ from antlr4 import *
 from utils.file_reader import FileReader
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
-from .polymorphismListener import PolymorphismListener
-from .javaContainer import JavaCLassContainer, JavaInterfaceContaienr
+from .polymorphism_listener import PolymorphismListener
+from .java_container import JavaCLassContainer, JavaInterfaceContaienr
 
 
 class Polymorphism:
-    def __init__(self, projectPath):
-        self.projectPath = projectPath
-        self.javaClassContainer = JavaCLassContainer()
-        self.javaInterfaceContainer = JavaInterfaceContaienr()
+    def __init__(self, project_path):
+        self.project_path = project_path
+        self.java_class_container = JavaCLassContainer()
+        self.java_interface_container = JavaInterfaceContaienr()
 
-        for stream in FileReader.getFileStreams(self.projectPath):
-            listener = self.getListener(stream)
-            self.extractStreamClasses(listener)
-            self.extractStreamInterfaces(listener)
+        for stream in FileReader.get_file_streams(self.project_path):
+            listener = self.get_listener(stream)
+            self.extract_stream_classes(listener)
+            self.extract_stream_interfaces(listener)
+        self.set_interface_parents()
+        self.set_class_parents()
 
-        self.setInterfaceParents()
-        self.setClassParents()
-
-    def getListener(self, stream):
+    def get_listener(self, stream):
         lexer = JavaLexer(stream)
-        tokenStream = CommonTokenStream(lexer)
-        parser = JavaParserLabeled(tokenStream)
+        token_stream = CommonTokenStream(lexer)
+        parser = JavaParserLabeled(token_stream)
         parser.getTokenStream()
-        parseTree = parser.compilationUnit()
-
-        listener =PolymorphismListener()
+        parse_tree = parser.compilationUnit()
+        listener = PolymorphismListener()
         walker = ParseTreeWalker()
-        walker.walk(t=parseTree, listener=listener)
+        walker.walk(t=parse_tree, listener=listener)
         return listener
 
-    def extractStreamClasses(self, listener):
-        javaClassList = listener.getClassList()
-        for javaClass in javaClassList:
-            self.javaClassContainer.addJavaClass(javaClass)
+    def extract_stream_classes(self, listener):
+        java_class_list = listener.get_class_list()
+        for java_class in java_class_list:
+            self.java_class_container.add_java_class(java_class)
 
-    def extractStreamInterfaces(self, listener):
-        javaInterfaceList = listener.getInterfaceList()
-        for javaInterface in javaInterfaceList:
-            self.javaInterfaceContainer.addJavaInterface(javaInterface)
+    def extract_stream_interfaces(self, listener):
+        java_interface_list = listener.get_interface_list()
+        for java_interface in java_interface_list:
+            self.java_interface_container.add_java_interface(java_interface)
 
-    def setClassParents(self):
-        for javaClass in self.javaClassContainer.javaClassList():
-            javaBuiltInParents = []
-            for parentName in javaClass.parentNameList():
-                if self.javaClassContainer.getJavaClass(parentName):
-                    javaClass.addParent(parentName, self.javaClassContainer.getJavaClass(parentName))
+    def set_class_parents(self):
+        for java_class in self.java_class_container.java_class_list():
+            java_builtin_parents = []
+            for parent_name in java_class.parent_name_list():
+                if self.java_class_container.get_java_class(parent_name):
+                    java_class.add_parent(parent_name, self.java_class_container.get_java_class(parent_name))
                 else:
-                    javaBuiltInParents.append(parentName)
+                    java_builtin_parents.append(parent_name)
 
-            for builtInParent in javaBuiltInParents:
+            for builtin_parent in java_builtin_parents:
                 # We exclude inheriting Java built-in classes.
-                javaClass.removeParent(builtInParent)
+                java_class.remove_parent(builtin_parent)
 
-        for javaClass in self.javaClassContainer.javaClassList():
-            javaBuiltinInterfaces = []
-            for interfaceName in javaClass.interfaceNameList():
-                if self.javaInterfaceContainer.getJavaInterface(interfaceName):
-                    javaClass.addInterface(interfaceName, self.javaInterfaceContainer.getJavaInterface(interfaceName))
+        for java_class in self.java_class_container.java_class_list():
+            java_builtin_interfaces = []
+            for interface_name in java_class.interface_name_list():
+                if self.java_interface_container.get_java_interface(interface_name):
+                    java_class.addInterface(
+                        interface_name, self.java_interface_container.get_java_interface(interface_name))
                 else:
-                    javaBuiltinInterfaces.append(interfaceName)
+                    java_builtin_interfaces.append(interface_name)
 
-            for javaBuiltinInterface in javaBuiltinInterfaces:
-                javaClass.removeInterface(javaBuiltinInterface)
+            for java_builtin_interface in java_builtin_interfaces:
+                java_class.remove_interface(java_builtin_interface)
 
-    def setInterfaceParents(self):
-        for javaInterface in self.javaInterfaceContainer.javaInterfaceList():
-            javaBuiltinInterfaces = []
-            for parentName in javaInterface.parentNameList():
-                if self.javaInterfaceContainer.getJavaInterface(parentName):
-                    javaInterface.addParent(parentName, self.javaInterfaceContainer.getJavaInterface(parentName))
+    def set_interface_parents(self):
+        for java_interface in self.java_interface_container.java_interface_list():
+            java_builtin_interfaces = []
+            for parent_name in java_interface.parent_name_list():
+                if self.java_interface_container.get_java_interface(parent_name):
+                    java_interface.add_parent(
+                        parent_name, self.java_interface_container.get_java_interface(parent_name))
                 else:
-                    javaBuiltinInterfaces.append(parentName)
+                    java_builtin_interfaces.append(parent_name)
 
-            for builtInParent in javaBuiltinInterfaces:
-                javaInterface.removeParent(builtInParent)
+            for builtin_parent in java_builtin_interfaces:
+                java_interface.remove_parent(builtin_parent)
 
 
-    def calcPolymorphism(self):
-        totalMethodsCanBeOverriden = 0
-        for javaClass in self.javaClassContainer.javaClassList():
-            inheritedMethods = javaClass.getInheritedMethodList()
-            for method in javaClass.methodList():
-                isInherited = False
-                for iMethod in inheritedMethods:
+    def calc_polymorphism(self):
+        total_methods_can_be_overriden = 0
+        for java_class in self.java_class_container.java_class_list():
+            inherited_methods = java_class.get_inherited_method_list()
+            for method in java_class.method_list():
+                is_inherited = False
+                for iMethod in inherited_methods:
                     if iMethod == method:
-                        isInherited = True
+                        is_inherited = True
                         break
-                if not isInherited and not(
-                    method.getModifier().isPrivate()
-                    or method.getModifier().isFinal()
-                    or method.getModifier().isStatic()
+                if not is_inherited and not(
+                    method.get_modifier().is_private()
+                    or method.get_modifier().is_final()
+                    or method.get_modifier().is_static()
                 ):
-                    totalMethodsCanBeOverriden += 1
+                    total_methods_can_be_overriden += 1
 
-        for javaInterface in self.javaInterfaceContainer.javaInterfaceList():
-            inheritedMethods = javaInterface.getInheritedMethodList()
-            for method in javaInterface.methodList():
-                isInherited = False
-                for iMethod in inheritedMethods:
+        for java_interface in self.java_interface_container.java_interface_list():
+            inherited_methods = java_interface.get_inherited_method_list()
+            for method in java_interface.method_list():
+                is_inherited = False
+                for iMethod in inherited_methods:
                     if iMethod == method:
-                        isInherited = True
+                        is_inherited = True
                         break
-                if not isInherited and not(
-                    method.getModifier().isPrivate()
-                    or method.getModifier().isFinal()
-                    or method.getModifier().isStatic()
+                if not is_inherited and not(
+                    method.get_modifier().is_private()
+                    or method.get_modifier().is_final()
+                    or method.get_modifier().is_static()
                 ):
-                    totalMethodsCanBeOverriden += 1
+                    total_methods_can_be_overriden += 1
 
-        if self.javaClassContainer.getSize() == 0 and self.javaInterfaceContainer.getSize():
+        if self.java_class_container.get_size() == 0 and self.java_interface_container.get_size():
             return 0
-        return totalMethodsCanBeOverriden / (self.javaClassContainer.getSize() + self.javaInterfaceContainer.getSize())
+        return (total_methods_can_be_overriden /
+                (self.java_class_container.get_size() + self.java_interface_container.get_size()))
 
-    def calcInheritence(self):
-        sumMetricForClassAndInterface = 0
-        for javaClass in self.javaClassContainer.javaClassList():
-            inheritedMethods = javaClass.getInheritedMethodList()
-            countInherited = len(inheritedMethods)
-            countMethods = countInherited
+    def calc_inheritence(self):
+        sum_metric_for_class_and_interface = 0
+        for java_class in self.java_class_container.java_class_list():
+            inherited_methods = java_class.get_inherited_method_list()
+            count_inherited = len(inherited_methods)
+            count_methods = count_inherited
 
-            for method in javaClass.methodList():
-                isOverriden = False
-                for iMethod in inheritedMethods:
+            for method in java_class.method_list():
+                is_overriden = False
+                for iMethod in inherited_methods:
                     if iMethod == method:
-                        isOverriden = True
+                        is_overriden = True
                         break
-                if not isOverriden:
-                    countMethods += 1
+                if not is_overriden:
+                    count_methods += 1
 
-            if countMethods != 0:
-                sumMetricForClassAndInterface += countInherited / countMethods
+            if count_methods != 0:
+                sum_metric_for_class_and_interface += count_inherited / count_methods
 
-        for javaInterface in self.javaInterfaceContainer.javaInterfaceList():
-            inheritedMethods = javaInterface.getInheritedMethodList()
-            countInherited = len(inheritedMethods)
-            countMethods = countInherited
+        for java_interface in self.java_interface_container.java_interface_list():
+            inherited_methods = java_interface.get_inherited_method_list()
+            count_inherited = len(inherited_methods)
+            count_methods = count_inherited
 
-            for method in javaInterface.methodList():
-                isOverriden = False
-                for iMethod in inheritedMethods:
+            for method in java_interface.method_list():
+                is_overriden = False
+                for iMethod in inherited_methods:
                     if iMethod == method:
-                        isOverriden = True
+                        is_overriden = True
                         break
-                if not isOverriden:
-                    countMethods += 1
+                if not is_overriden:
+                    count_methods += 1
 
-            if countMethods != 0:
-                sumMetricForClassAndInterface += countInherited / countMethods
+            if count_methods != 0:
+                sum_metric_for_class_and_interface += count_inherited / count_methods
 
-        if self.javaClassContainer.getSize() == 0 and self.javaInterfaceContainer.getSize() == 0:
+        if self.java_class_container.get_size() == 0 and self.java_interface_container.get_size() == 0:
             return 0
-        return sumMetricForClassAndInterface / (self.javaClassContainer.getSize() + self.javaInterfaceContainer.getSize())
+        return (sum_metric_for_class_and_interface /
+                (self.java_class_container.get_size() + self.java_interface_container.get_size()))

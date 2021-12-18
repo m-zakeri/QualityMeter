@@ -4,8 +4,8 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLab
 class CouplingListener(JavaParserLabeledListener):
     def __init__(self):
         self.list = []
-        self.numClasses = 0
-        self.numInterfaces = 0
+        self.num_classes = 0
+        self.num_interfaces = 0
 
     def get_coupling_size(self):
         unique_items = []
@@ -14,17 +14,17 @@ class CouplingListener(JavaParserLabeledListener):
                 unique_items.append(item)
         return len(unique_items)
 
-    def getNumClasses(self):
-        return self.numClasses
+    def get_num_classes(self):
+        return self.num_classes
 
-    def getNumInterfaces(self):
-        return self.numInterfaces
+    def get_num_interfaces(self):
+        return self.num_interfaces
 
     def enterClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
-        self.numClasses += 1
+        self.num_classes += 1
 
     def enterInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
-        self.numInterfaces += 1
+        self.num_interfaces += 1
 
     # covering local variable declaration
     def enterLocalVariableDeclaration(self, ctx:JavaParserLabeled.LocalVariableDeclarationContext):

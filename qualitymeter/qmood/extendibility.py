@@ -7,34 +7,34 @@ from .metrics.abstraction import Abstraction
 from .metrics.coupling import Coupling
 
 class Extendability:
-    def __init__(self, projectPath):
-        self.projectPath = projectPath
-        self.polymorphismMeter = Polymorphism(self.projectPath)
-        self.abstractionMeter = Abstraction(self.projectPath)
+    def __init__(self, project_path):
+        self.project_path = project_path
+        self.polymorphism_meter = Polymorphism(self.project_path)
+        self.abstraction_meter = Abstraction(self.project_path)
 
-        self.polymorphismValue = self.calcPolymorphism()
-        self.abstractionValue = self.calcAbstraction()
-        self.inheritanceValue = self.calcInheritance()
-        self.couplingValue = self.calcCoupling()
+        self.polymorphism_value = self.calc_polymorphism()
+        self.abstraction_value = self.calc_abstraction()
+        self.inheritance_value = self.calc_inheritance()
+        self.coupling_value = self.calc_coupling()
 
-        print("Polymorphism = ", self.polymorphismValue)
-        print("Abstraction = ", self.abstractionValue)
-        print("Inheritance = ", self.inheritanceValue)
-        print("Coupling = ", self.couplingValue)
+        print("Polymorphism = ", self.polymorphism_value)
+        print("Abstraction = ", self.abstraction_value)
+        print("Inheritance = ", self.inheritance_value)
+        print("Coupling = ", self.coupling_value)
 
-    def calcAbstraction(self):
-        return self.abstractionMeter.calcAbstraction()
+    def calc_abstraction(self):
+        return self.abstraction_meter.calc_abstraction()
 
-    def calcCoupling(self):
-        couplingMeter = Coupling(self.projectPath)
-        return couplingMeter.calcCoupling()
+    def calc_coupling(self):
+        coupling_meter = Coupling(self.project_path)
+        return coupling_meter.calc_coupling()
 
-    def calcInheritance(self):
-        return self.polymorphismMeter.calcInheritence()
+    def calc_inheritance(self):
+        return self.polymorphism_meter.calc_inheritence()
 
-    def calcPolymorphism(self):
-        return self.polymorphismMeter.calcPolymorphism()
+    def calc_polymorphism(self):
+        return self.polymorphism_meter.calc_polymorphism()
 
-    def getExtendabilityMeasure(self):
-        return 0.5 * (self.abstractionValue - self.couplingValue
-              + self.inheritanceValue + self.polymorphismValue)
+    def get_extendability_measure(self):
+        return 0.5 * (self.abstraction_value - self.coupling_value
+                + self.inheritance_value + self.polymorphism_value)

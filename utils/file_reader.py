@@ -7,7 +7,7 @@ class FileReader:
         pass
 
     @classmethod
-    def getFileStream(cls, file):
+    def get_file_stream(cls, file):
         try:
             stream = FileStream(file, encoding='utf-8')
         except UnicodeDecodeError:
@@ -15,10 +15,10 @@ class FileReader:
         return stream
 
     @classmethod
-    def getFileStreams(cls, path):
+    def get_file_streams(cls, path):
         with os.scandir(path) as it:
             for entry in it:
                 if entry.is_file() and entry.name.endswith('.java'):
-                    yield cls.getFileStream(entry.path)
+                    yield cls.get_file_stream(entry.path)
                 elif entry.is_dir():
-                    yield from cls.getFileStreams(entry.path)
+                    yield from cls.get_file_streams(entry.path)

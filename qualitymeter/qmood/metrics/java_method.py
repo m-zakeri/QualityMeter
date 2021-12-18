@@ -13,34 +13,34 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 
 
 class JavaMethod:
-    def __init__(self, methodName=""):
-        self.methodName = methodName
-        self.parameterList = []
+    def __init__(self, method_name=""):
+        self.method_name = method_name
+        self.parameter_list = []
 
-    def getNumOfParameters(self):
-        return len(self.parameterList)
+    def get_num_of_parameters(self):
+        return len(self.parameter_list)
 
-    def setParameterList(self, parameterList):
-        if not parameterList:
+    def set_parameter_list(self, parameter_list):
+        if not parameter_list:
             return
 
         try:
-            formalParameters = parameterList.formalParameter()
-            for parameter in formalParameters:
-                self.parameterList.append(self.getTypeOfParameter(parameter))
+            formal_parameters = parameter_list.formalParameter()
+            for parameter in formal_parameters:
+                self.parameter_list.append(self.get_type_of_parameter(parameter))
         except AttributeError:
-            parameter = parameterList.lastFormalParameter()
-            self.parameterList.append(self.getTypeOfParameter(parameter))
+            parameter = parameter_list.lastFormalParameter()
+            self.parameter_list.append(self.get_type_of_parameter(parameter))
 
-    def getTypeOfParameter(self, parameter):
+    def get_type_of_parameter(self, parameter):
         if parameter.typeType().classOrInterfaceType():
             for classOrInterface in parameter.typeType().classOrInterfaceType().IDENTIFIER():
                 return classOrInterface.getText()
         if parameter.typeType().primitiveType():
             primitive = parameter.typeType().primitiveType()
-            return self.getPrimitiveType(primitive)
+            return self.get_primitive_type(primitive)
 
-    def getPrimitiveType(self, primitive):
+    def get_primitive_type(self, primitive):
         if primitive.BOOLEAN():
             return primitive.BOOLEAN().getText()
         if primitive.CHAR():
@@ -60,18 +60,18 @@ class JavaMethod:
 
     # if two function signatures are equal, __eq__ returns true
     def __eq__(self, other):
-        if other.methodName != self.methodName:
+        if other.method_name != self.method_name:
             return False
-        if other.getNumOfParameters() != other.getNumOfParameters():
+        if other.get_num_of_parameters() != other.get_num_of_parameters():
             return False
 
-        for parameter in zip(self.parameterList, other.parameterList):
+        for parameter in zip(self.parameter_list, other.parameter_list):
             if parameter[0] != parameter[1]:
                 return False
         return True
 
-    def setModifier(self, modifier):
+    def set_modifier(self, modifier):
         self.modifier = modifier
 
-    def getModifier(self):
+    def get_modifier(self):
         return self.modifier

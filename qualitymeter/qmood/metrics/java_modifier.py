@@ -4,20 +4,20 @@ class JavaModifier:
         self.FINAL = False
         self.STATIC = False
 
-    def setFinalFlag(self, flag):
+    def set_final_flag(self, flag):
         self.FINAL = flag
 
-    def setPrivateFlag(self, flag):
+    def set_private_flag(self, flag):
         self.FINAL = flag
 
-    def setStaticFlag(self, flag):
+    def set_static_flag(self, flag):
         self.STATIC = flag
 
-    def isFinal(self):
+    def is_final(self):
         return self.FINAL
 
-    def isPrivate(self):
+    def is_private(self):
         return self.PRIVATE
 
-    def isStatic(self):
+    def is_static(self):
         return self.STATIC

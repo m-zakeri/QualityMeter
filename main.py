@@ -7,7 +7,7 @@ def main(args):
     print("---Extendability Report---")
     path = args.dir
     extendabilityMeter = Extendability(path)
-    print(extendabilityMeter.getExtendabilityMeasure())
+    print(extendabilityMeter.get_extendability_measure())
 
 
 if __name__ == "__main__":
