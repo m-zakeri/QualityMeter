@@ -17,11 +17,6 @@ class Extendability:
         self.inheritance_value = self.calc_inheritance()
         self.coupling_value = self.calc_coupling()
 
-        print("Polymorphism = ", self.polymorphism_value)
-        print("Abstraction = ", self.abstraction_value)
-        print("Inheritance = ", self.inheritance_value)
-        print("Coupling = ", self.coupling_value)
-
     def calc_abstraction(self):
         return self.abstraction_meter.calc_abstraction()
 
@@ -35,6 +30,15 @@ class Extendability:
     def calc_polymorphism(self):
         return self.polymorphism_meter.calc_polymorphism()
 
-    def get_extendability_measure(self):
+    def calc_extendability_measure(self):
         return 0.5 * (self.abstraction_value - self.coupling_value
                 + self.inheritance_value + self.polymorphism_value)
+
+    def display_result(self):
+        print("--------- Extendability Report ---------")
+        print("Polymorphism:\t", self.polymorphism_value)
+        print("Abstraction:\t", self.abstraction_value)
+        print("Inheritance:\t", self.inheritance_value)
+        print("Coupling:\t", self.coupling_value)
+        print("----------------------------------------")
+        print("Extendability:\t", self.calc_extendability_measure())
