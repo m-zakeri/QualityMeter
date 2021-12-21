@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/funlife/Downloads/QualityMeter/")
+sys.path.append("/home/soroushh/Downloads/QualityMeter/")
 from antlr4 import *
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
@@ -82,6 +82,21 @@ class encapsulationListener(JavaParserLabeledListener):
         if not self.__entered_nested_class:
             self.__is_enter_class = False
             self.__entered_nested_class = False
+
+    def enterInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
+        # ignore classes inside another class
+        if not self.__is_entered_class:
+            self.__class_name = ctx.IDENTIFIER().getText()
+            self.total_classes[self.__class_name] = (0, 0)
+            self.__is_entered_class = True
+            self.__entered_nested_class = False
+        else:
+            self.__entered_nested_class = True
+
+    def exitInterfaceDeclaration(self, ctx:JavaParserLabeled.InterfaceDeclarationContext):
+        if not self.__entered_nested_class:
+            self.__is_enter_class = False
+            self.__entered_nested_class = False
 		
     def enterFieldDeclaration(self, ctx:JavaParserLabeled.FieldDeclarationContext):
         """
@@ -137,7 +152,6 @@ def get_all_filenames(walk_dir, valid_extensions):
             if any([filename.endswith(extension) for extension in valid_extensions]) and "test" not in file_path:
                 yield file_path
 
-
 def get_DAM_metric(walk_dir, valid_extensions):
     walker = ParseTreeWalker()
 
@@ -151,13 +165,15 @@ def get_DAM_metric(walk_dir, valid_extensions):
 
         listener = encapsulationListener()
         walker.walk(t=parse_tree, listener=listener)
+
+        print(listener.total_classes)
         
         metric_values.append(listener.get_DAM_ratio())
         
     return sum(metric_values) / len(metric_values)
 
 if __name__ == "__main__":
-    walk_dir = "path_to_target_project_directory"
+    walk_dir = "/home/soroushh/Downloads/QualityMeter/qualitymeter/qmood"
     valid_extensions = [".java"]
     
     value = get_DAM_metric(walk_dir, valid_extensions)
