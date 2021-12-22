@@ -21,6 +21,7 @@ class flexibilityListener(JavaParserLabeledListener):
         self.__parameters_of_method = []
         # 
         self.__number_of_polymorphic_methods = 0
+        self.__is_final = None
         self.__current_class_or_interface = None
         # self.__superclasses = {}
         self.__parent_and_child_classes = {}
@@ -96,7 +97,7 @@ class flexibilityListener(JavaParserLabeledListener):
         """
         # if class is final
         if ctx.FINAL():
-            self.__number_of_polymorphic_methods = 0
+            self.__is_final = True
 
     def enterModifier(self, ctx: JavaParserLabeled.ModifierContext):
         """Modifier checks the access specifier of methods
@@ -124,9 +125,13 @@ class flexibilityListener(JavaParserLabeledListener):
             ctx (JavaParserLabeled.MethodDeclarationContext): [description]
         """
 
-        self.__number_of_polymorphic_methods += 1
-        self.__number_of_polymorphic_methods -= self.__temp_modifier
-        self.__temp_modifier = 0
+        if self.__is_final:
+            self.__number_of_polymorphic_methods = 0
+
+        else:
+            self.__number_of_polymorphic_methods += 1
+            self.__number_of_polymorphic_methods -= self.__temp_modifier
+
         self.__list_of_methods[self.__current_class_or_interface].append(ctx.IDENTIFIER().getText())
 
     def enterClassBodyDeclaration2(self, ctx: JavaParserLabeled.ClassBodyDeclaration2Context):
@@ -136,7 +141,7 @@ class flexibilityListener(JavaParserLabeledListener):
             ctx (JavaParserLabeled.ClassBodyDeclaration2Context): [description]
         """
 
-        # 
+        #
         if not self.__entered_nested_class:
             prv_attrs, tot_attrs = self.total_classes_for_DAM[self.__current_class_or_interface]
             self.last_number_of_private_attrs = 0
@@ -166,7 +171,7 @@ class flexibilityListener(JavaParserLabeledListener):
         self.__list_of_methods[self.__current_class_or_interface] = []
 
         # ignore classes inside another class
-        #  
+        #
         if not self.__is_entered_class:
             # self.__class_name = ctx.IDENTIFIER().getText()
             self.total_classes_for_DAM[self.__current_class_or_interface] = (0, 0)
@@ -175,12 +180,12 @@ class flexibilityListener(JavaParserLabeledListener):
         else:
             self.__entered_nested_class = True
 
-        # 
+        #
         # increase the number of non primitive classes
         if ctx.IDENTIFIER().getText() not in self.primitive_types:
             self.__non_primitive_classes.append(ctx.IDENTIFIER().getText())
 
-        # 
+        #
         # create a list of classes with their parents
         if ctx.EXTENDS() is not None:
             self.__parent_and_child_classes[ctx.IDENTIFIER().getText()] = ctx.typeType().getText()
@@ -206,6 +211,9 @@ class flexibilityListener(JavaParserLabeledListener):
             self.__is_enter_class = False
             self.__entered_nested_class = False
 
+        if self.__is_final:
+            self.__is_final = False
+
     def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceDeclarationContext):
         """check if parser enters the interface
 
@@ -215,7 +223,7 @@ class flexibilityListener(JavaParserLabeledListener):
 
         self.__number_of_classes += 1
 
-        # 
+        #
         if not self.__is_entered_class:
             # self.__class_name = ctx.IDENTIFIER().getText()
             self.total_classes_for_DAM[self.__current_class_or_interface] = (0, 0)
@@ -385,10 +393,25 @@ if __name__ == '__main__':
         # print("metrics for " + file_name)
         # print(f"NOP: {NOP} \nDAM: {DAM} \nMOA: {MOA} \nDCC: {DCC} \n")
 
-    NOP = sum(NOP_values) / len(NOP_values)
-    DAM = sum(DAM_values) / len(DAM_values)
-    MOA = sum(MOA_values) / len(MOA_values)
-    DCC = sum(DCC_values) / len(DCC_values)
+    if len(NOP_values) == 0:
+        NOP = 0
+    else:
+        NOP = sum(NOP_values) / len(NOP_values)
+
+    if len(DAM_values) == 0:
+        DAM = 0
+    else:
+        DAM = sum(DAM_values) / len(DAM_values)
+
+    if len(MOA_values) == 0:
+        MOA = 0
+    else:
+        MOA = sum(MOA_values) / len(MOA_values)
+
+    if len(DCC_values) == 0:
+        DCC = 0
+    else:
+        DCC = sum(DCC_values) / len(DCC_values)
 
     # print("Number of Overridden Methods: ", sum(NOM_values))
 
