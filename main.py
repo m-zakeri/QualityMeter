@@ -1,16 +1,12 @@
-"""
-Entry point of the program.
-
-"""
-
 import argparse
 import sys
 from tabulate import tabulate
-from qualitymeter.utils.file_reader import FileReader
+from utils.file_reader import FileReader
 from qualitymeter.qmood.understandability import Understandability
+from qualitymeter.qmood.extendibility import Extendability
 
 
-def main(arguments):
+def analyze_undrestandibility(project_path):
     """
     getting the file address from user and giving back the result in a table
 
@@ -19,7 +15,7 @@ def main(arguments):
     """
 
     # creating the streams of files to be walked by the Understandability class
-    streams = FileReader.getFileStreams(arguments.path)
+    streams = FileReader.get_file_streams(project_path)
     understandability, coupling, cohesion, design_size, abstraction, \
         encapsulation, polymorphism, complexity = Understandability(streams).get_value()
 
@@ -30,11 +26,21 @@ def main(arguments):
     headers = ["metric name", "value"]
 
     # printing the results.
-    title = "\n\n\nThe Project Report for: {0}\n\n".format(arguments.path)
+    title = "\n\n\nThe Project Report for: {0}\n\n".format(project_path)
     table_result = tabulate(table, headers, tablefmt="presto")
     print(title)
     print(table_result)
     print("\n\n")
+
+
+def analyze_extendability(project_path):
+    extendability_meter = Extendability(project_path)
+    extendability_meter.display_result()
+
+
+def main(arguments):
+    analyze_undrestandibility(arguments.path)
+    analyze_extendability(arguments.path)
 
 
 # Taking the arguments from user and starting the program
