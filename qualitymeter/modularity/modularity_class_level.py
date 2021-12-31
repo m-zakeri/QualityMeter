@@ -17,7 +17,7 @@ class realationListener(JavaParserLabeledListener):
         self.__currentClass = "None"
         self.__currentMethod = "None"
         self.__everyObjectAndItsClass = {}
-        self.VariableDeclarator = ""
+        self.__classStack = [0]
         self.__nodes = []
         self.__edges = {}
 
@@ -29,8 +29,16 @@ class realationListener(JavaParserLabeledListener):
 
     # To Get the nodes (better to say Methods)---------------------------------------------------------------
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
-        self.__currentClass = ctx.IDENTIFIER().getText()
-        # print('entered class is:', self.__currentClass)
+       self.__currentClass = ctx.IDENTIFIER().getText()
+       self.__classStack.append(self.__currentClass)
+       #print('entered class is:', self.__currentClass)
+
+    def exitClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
+        x = self.__classStack.pop()
+        lastItem = len(self.__classStack) - 1
+        if  lastItem is not 0:
+            self.__currentClass = self.__classStack[lastItem]
+        #print('exited class is:', x)
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         self.__currentMethod = ctx.IDENTIFIER().getText()
@@ -68,6 +76,7 @@ class realationListener(JavaParserLabeledListener):
         # print(ctx.expression().getText())
         # print(self.__currentMethod)
         if ctx.expression().primary().getText() == 'this':
+            #if hasattr(ctx, 'methodCall' )
             if isinstance(ctx.methodCall(), type(None)):
                 return
             else:
@@ -146,7 +155,6 @@ def compile_j(arg, graph):
 
 def main():
     graph = nx.Graph()
-
     pattern = re.compile(r".+\.java$")
     for root, subdirs, files in os.walk('.'):
         java_file_names = list(filter(lambda f: pattern.match(f), files))
