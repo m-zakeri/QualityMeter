@@ -8,13 +8,18 @@ from antlr4 import CommonTokenStream, ParseTreeWalker
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.listener.listener import Listener
+from utils.file_reader import FileReader
 
 
 class WalkerCreator:
-    def __init__(self, streams):
+    def __init__(self, path):
         self.classes = []
         self.interfaces = []
         self.classOrInterface = []
+        self.walk(path)
+
+    def walk(self, path):
+        streams = FileReader.get_file_streams(path)
 
         for stream in streams:
             # Create lexer from data stream.
@@ -45,11 +50,8 @@ class WalkerCreator:
                 if clf.identifier.getText() == implementation.identifier.getText():
                     return clf
 
-
-
     def intersection(self, lst1, lst2):
         # Use of hybrid method
         temp = set(lst2)
         lst3 = [value for value in lst1 if value in temp]
         return lst3
-

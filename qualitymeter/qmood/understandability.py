@@ -7,8 +7,8 @@ from qualitymeter.utils.walker_creator import WalkerCreator
 
 
 class Understandability(WalkerCreator):
-    def __init__(self, streams):
-        WalkerCreator.__init__(self, streams)
+    def __init__(self, path):
+        WalkerCreator.__init__(self, path)
 
     def calc_coupling(self):
         """
@@ -137,10 +137,10 @@ class Understandability(WalkerCreator):
         return result
 
     def calc_polymorphism(self):
-        """
-        calculating polymorphism.
+        """calculating polymorphism.
 
-        :return: results
+        Returns:
+            (Int) result: the average number pf polymorphic methods in our project.
         """
 
         polymorphic_methods = []
@@ -148,7 +148,7 @@ class Understandability(WalkerCreator):
             polymorphic = 0
             if cls:
                 for clmt in cls.methods:
-                    if "private" not in clmt.modifiers and "final" not in clmt.modifiers:
+                    if "private" not in clmt.modifiers and "final" not in clmt.modifiers and "static" not in clmt.modifier:
                         polymorphic += 1
                 polymorphic_methods.append(polymorphic)
 
