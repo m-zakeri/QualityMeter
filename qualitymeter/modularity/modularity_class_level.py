@@ -17,7 +17,7 @@ class realationListener(JavaParserLabeledListener):
         self.__currentClass = "None"
         self.__currentMethod = "None"
         self.__everyObjectAndItsClass = {}
-        self.VariableDeclarator = ""
+        self.__classStack = [0]
         self.__nodes = []
         self.__edges = {}
 
@@ -29,8 +29,16 @@ class realationListener(JavaParserLabeledListener):
 
     # To Get the nodes (better to say Methods)---------------------------------------------------------------
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
-        self.__currentClass = ctx.IDENTIFIER().getText()
-        # print('entered class is:', self.__currentClass)
+       self.__currentClass = ctx.IDENTIFIER().getText()
+       self.__classStack.append(self.__currentClass)
+       #print('entered class is:', self.__currentClass)
+
+    def exitClassDeclaration(self, ctx:JavaParserLabeled.ClassDeclarationContext):
+        x = self.__classStack.pop()
+        lastItem = len(self.__classStack) - 1
+        if  lastItem is not 0:
+            self.__currentClass = self.__classStack[lastItem]
+        #print('exited class is:', x)
 
     def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         self.__currentMethod = ctx.IDENTIFIER().getText()
@@ -68,6 +76,7 @@ class realationListener(JavaParserLabeledListener):
         # print(ctx.expression().getText())
         # print(self.__currentMethod)
         if ctx.expression().primary().getText() == 'this':
+            #if hasattr(ctx, 'methodCall' )
             if isinstance(ctx.methodCall(), type(None)):
                 return
             else:
@@ -93,8 +102,6 @@ class realationListener(JavaParserLabeledListener):
             return
         if 'this' in ctx.methodCall().getText():
             return
-        # print(ctx.methodCall().getText())
-        # print(self.__currentMethod)
         if isinstance(ctx.methodCall(), type(None)):
             return
         else:
@@ -129,9 +136,9 @@ def compile_j(arg, graph):
     lexer = JavaLexer(stream)  # Step 1.2: Create an instance of AssignmentStLexer
     token_stream = CommonTokenStream(lexer)  # Step 1.3: Convert the input source into a list of tokens
     parser = JavaParserLabeled(token_stream)  # Step 1.4: Create an instance of the AssignmentStParser
+    parse_tree = parser.compilationUnit()  # Step 2.1: Create parse tree
 
     # Stage 2 --------------------------------------------------------------------------------------------------------
-    parse_tree = parser.compilationUnit()  # Step 2.1: Create parse tree
     my_listener = realationListener()  # Step 2.2: Create an instance of AssignmentStListener
     walker = ParseTreeWalker()  # Step 2.3: Create a walker to traverse the parse tree
     walker.walk(t=parse_tree, listener=my_listener)  # Step 2.4: Traverse the parse tree using Listener
@@ -139,19 +146,29 @@ def compile_j(arg, graph):
     # print('edges are :', my_listener.getEdges())
 
     # Stage 3 --------------------------------------------------------------------------------------------------------
-    add_nodes(graph, my_listener.getNodes())
+    edges = my_listener.getEdges()
+    startNodes = list(edges.keys())
+    for i in range(len(startNodes)):
+        if '<' in edges[startNodes[i]][0]:
+            del edges[startNodes[i]]
+    add_nodes(graph, my_listener.getNodes()) # Step 2.2: Create an instance of AssignmentStListener
     add_edges(graph, my_listener.getEdges())
     # print('Graph nodes are :', graph.nodes)
     # print('Graph edges are :', graph.edges)
 
 def main():
     graph = nx.Graph()
-
+    count = 0
     pattern = re.compile(r".+\.java$")
     for root, subdirs, files in os.walk('.'):
         java_file_names = list(filter(lambda f: pattern.match(f), files))
         for el in java_file_names:
+            count = count + 1
+            print('File #',count,'-----------------------------------------')
+            print(el)
             compile_j(os.path.join(root, el), graph)
+            print('number of nodes:', graph.number_of_nodes())
+            print('number of edges:', graph.number_of_edges())
 
     # Measure modularity
     q = nx_comm.modularity(graph, nx_comm.label_propagation_communities(graph))
