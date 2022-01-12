@@ -91,18 +91,21 @@ class DetectPushDownMethod(WalkerCreator):
             # extract child classes from extends keyword (used for classes)
             for cl in self.classes:
                 for par in cl.parents:
-                    if sc.identifier.getText() == par.identifier.getText():
-                        sc.add_child(cl)
+                    if par and cl:
+                        if sc.identifier.getText() == par.identifier.getText():
+                            sc.add_child(cl)
 
         for inf in self.interfaces:
             # extract child classes from extends keyword and implements keyword (used for interfaces)
             for cl2 in self.classes:
                 for par2 in cl2.parents:
-                    if inf.identifier.getText() == par2.identifier.getText():
-                        inf.add_child(cl2)
+                    if inf and par2:
+                        if inf.identifier.getText() == par2.identifier.getText():
+                            inf.add_child(cl2)
                 for imp in cl2.implementations:
-                    if inf.identifier.getText() == imp.identifier.getText():
-                        inf.add_child(cl2)
+                    if imp and inf:
+                        if inf.identifier.getText() == imp.identifier.getText():
+                            inf.add_child(cl2)
 
         self.__parents = self.__superclasses + self.interfaces
 
@@ -112,16 +115,17 @@ class DetectPushDownMethod(WalkerCreator):
         methodUsages = []
         for parent in self.__parents:
             methodUsage = {"parent": parent, "methods": []}
-            for method in parent.methods:
-                temp_method = {"method": method, "method_use": []}
-                for child in parent.children:
-                    target = {"target_class": child, "usage": []}
-                    for child_method in child.methods:
-                        if method.identifier.getText() == child_method.identifier.getText():
-                            target["usage"].append(child_method)
-                    if target["usage"]:
-                        temp_method["method_use"].append(target)
-                methodUsage["methods"].append(temp_method)
+            if parent:
+                for method in parent.methods:
+                    temp_method = {"method": method, "method_use": []}
+                    for child in parent.children:
+                        target = {"target_class": child, "usage": []}
+                        for child_method in child.methods:
+                            if method.identifier.getText() == child_method.identifier.getText():
+                                target["usage"].append(child_method)
+                        if target["usage"]:
+                            temp_method["method_use"].append(target)
+                    methodUsage["methods"].append(temp_method)
 
             methodUsages.append(methodUsage)
 
@@ -134,31 +138,32 @@ class DetectPushDownMethod(WalkerCreator):
         counter = 0
         for methodUsage in self.__methodusages:
             for method in methodUsage["methods"]:
-                ratio = len(method["method_use"]) / \
-                    len(methodUsage["parent"].children)
-                if ratio < heuristic/100 and ratio != 0:
-                    print(
-                        "___________________________________________________________________")
-                    print("\nparent package name: {0}".format(
-                        methodUsage["parent"].package_name))
-                    print("parent: {0}".format(
-                        methodUsage["parent"].identifier.getText()))
-                    print("method name: {0}\n".format(
-                        method["method"].identifier.getText()))
-                    print("\topportunities:")
-                    print("\t- - - - -")
-                    for usage in method["method_use"]:
-                        print("\tpackage of target class: {0}".format(
-                            usage["target_class"].package_name))
-                        print("\ttarget class: {0}".format(
-                            usage["target_class"].identifier.getText()))
-                        print("\ttargets:")
-                        for use in usage["usage"]:
-                            params = self.get_parameters(use.parameters)
-                            print("\t\ttarget method name: {0} - args: {1}".format(
-                                use.identifier.getText(), self.unique(params)))
+                if method and methodUsage["parent"].children:
+                    ratio = len(method["method_use"]) / \
+                        len(methodUsage["parent"].children)
+                    if ratio < heuristic/100 and ratio != 0:
+                        print(
+                            "___________________________________________________________________")
+                        print("\nparent package name: {0}".format(
+                            methodUsage["parent"].package_name))
+                        print("parent: {0}".format(
+                            methodUsage["parent"].identifier.getText()))
+                        print("method name: {0}\n".format(
+                            method["method"].identifier.getText()))
+                        print("\topportunities:")
                         print("\t- - - - -")
-                        counter += 1
-                    print("ratio: {0}".format(ratio))
+                        for usage in method["method_use"]:
+                            print("\tpackage of target class: {0}".format(
+                                usage["target_class"].package_name))
+                            print("\ttarget class: {0}".format(
+                                usage["target_class"].identifier.getText()))
+                            print("\ttargets:")
+                            for use in usage["usage"]:
+                                params = self.get_parameters(use.parameters)
+                                print("\t\ttarget method name: {0} - args: {1}".format(
+                                    use.identifier.getText(), self.unique(params)))
+                            print("\t- - - - -")
+                            counter += 1
+                        print("ratio: {0}".format(ratio))
 
         print("\nopportunities detected ({0})".format(counter))
