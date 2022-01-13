@@ -2,12 +2,13 @@
 This module identifies push-down method refactoring opportunities in Java projects.
 
 """
+import json
 from qualitymeter.utils.walker_creator import WalkerCreator
 
 
 class DetectPushDownMethod(WalkerCreator):
 
-    def __init__(self, path, heuristic):
+    def __init__(self, path, heuristic, output_name):
         WalkerCreator.__init__(self, path)
         self.__superclasses = []
         self.__methodusages = []
@@ -15,7 +16,7 @@ class DetectPushDownMethod(WalkerCreator):
         self.extractSuperClass()
         self.extractAllChildClasses()
         self.extractMethodUsage()
-        self.getPushDownOpportunities(heuristic)
+        self.getPushDownOpportunities(heuristic, output_name)
 
     def get_parameters(self, params):
         """get parameters with better format
@@ -131,10 +132,13 @@ class DetectPushDownMethod(WalkerCreator):
 
         self.__methodusages += methodUsages
 
-    def getPushDownOpportunities(self, heuristic):
+    def getPushDownOpportunities(self, heuristic, output_name):
         """use the heuristic given by the user to extract the push down method opportunities.
         """
-
+        Output = {
+            "Method Usages": [],
+            "Number Of Opportunities": 0
+        }
         counter = 0
         for methodUsage in self.__methodusages:
             for method in methodUsage["methods"]:
@@ -142,28 +146,34 @@ class DetectPushDownMethod(WalkerCreator):
                     ratio = len(method["method_use"]) / \
                         len(methodUsage["parent"].children)
                     if ratio < heuristic/100 and ratio != 0:
-                        print(
-                            "___________________________________________________________________")
-                        print("\nparent package name: {0}".format(
-                            methodUsage["parent"].package_name))
-                        print("parent: {0}".format(
-                            methodUsage["parent"].identifier.getText()))
-                        print("method name: {0}\n".format(
-                            method["method"].identifier.getText()))
-                        print("\topportunities:")
-                        print("\t- - - - -")
+                        ParentObject = {
+                            "parent package name": methodUsage["parent"].package_name,
+                            "parent name": methodUsage["parent"].identifier.getText(),
+                            "original mehtod name": method["method"].identifier.getText(),
+                            "opportunities": [],
+                            "ratio": None
+                        }
                         for usage in method["method_use"]:
-                            print("\tpackage of target class: {0}".format(
-                                usage["target_class"].package_name))
-                            print("\ttarget class: {0}".format(
-                                usage["target_class"].identifier.getText()))
-                            print("\ttargets:")
+                            MethodObject = {
+                                "target class package name": usage["target_class"].package_name,
+                                "target class name": usage["target_class"].identifier.getText(),
+                                "method": [] 
+                            }
                             for use in usage["usage"]:
                                 params = self.get_parameters(use.parameters)
-                                print("\t\ttarget method name: {0} - args: {1}".format(
-                                    use.identifier.getText(), self.unique(params)))
-                            print("\t- - - - -")
+                                TargetObject = {
+                                    "target method name": "{0} - args: {1}".format(
+                                    use.identifier.getText(), self.unique(params))
+                                }
+                                MethodObject["method"].append(TargetObject)
                             counter += 1
-                        print("ratio: {0}".format(ratio))
+                            ParentObject["opportunities"].append(MethodObject)
+                        ParentObject["ratio"] = ratio
+                        Output["Method Usages"].append(ParentObject)
+        
+        Output["Number Of Opportunities"] = counter
+        json_object = json.dumps(Output, indent = 4)
+        with open("output/" + output_name + ".json", "w") as outfile:
+                            outfile.write(json_object)
 
-        print("\nopportunities detected ({0})".format(counter))
+        print("\noutput has been printed to  output/{0}".format(output_name))

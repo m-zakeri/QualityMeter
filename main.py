@@ -37,13 +37,13 @@ def analyze_extendability(project_path):
     extendability_meter = Extendability(project_path)
     extendability_meter.display_result()
 
-def detect_push_down_method(project_path, heuristic):
-    DetectPushDownMethod(project_path, heuristic)
+def detect_push_down_method(project_path, heuristic, output_name):
+    DetectPushDownMethod(project_path, heuristic, output_name)
 
 
 def main(arguments):
-    if arguments.pushdownmethod and 1 <= int(arguments.pushdownmethod) <= 100:
-        detect_push_down_method(arguments.path, int(arguments.pushdownmethod))
+    if arguments.pdmp and arguments.pdmo and 1 <= int(arguments.pdmp) <= 100:
+        detect_push_down_method(arguments.path, int(arguments.pdmp), arguments.pdmo)
     if arguments.understandability:
         analyze_undrestandibility(arguments.path)
     if arguments.extendability:
@@ -57,8 +57,12 @@ if __name__ == "__main__":
         '--path',
         help='path for project.')
     parser.add_argument(
-        '--pushdownmethod',
-        help="give a value between 1 to 100 as a percentage to be used as heuristic."
+        '--pdmp',
+        help="(push-down method percent) give a value between 1 to 100 as a percentage to be used as heuristic."
+    )
+    parser.add_argument(
+        '--pdmo',
+        help="(push-down method output) the name of the output file."
     )
     parser.add_argument(
         '--understandability',
