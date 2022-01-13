@@ -26,6 +26,7 @@ class pullUpListener(JavaParserLabeledListener):
         self.__parent_and_child_classes = {}
         self.__methods_of_classes = {}
         self.__current_class_or_interface = None
+        self.__parameter_names = []
 
     @property
     def get_methods_and_classes(self):
@@ -80,7 +81,16 @@ class pullUpListener(JavaParserLabeledListener):
         if ctx.EXTENDS() is not None and ctx.typeList().getText() in self.__classes:
             self.__parent_and_child_classes[ctx.IDENTIFIER().getText()] = ctx.typeList().getText()
 
-    def enterMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
+    def enterFormalParameter(self, ctx:JavaParserLabeled.FormalParameterContext):
+        """
+        This method keeps track of parameters of each method.
+        :param: context of FormalParameterContext
+        :return: None
+        """
+
+        self.__parameter_names.append(ctx.typeType().getText())
+
+    def exitMethodDeclaration(self, ctx: JavaParserLabeled.MethodDeclarationContext):
         """
         This method add the methods of the current class to the proper dictionary.
         :param: context of MethodDeclarationContext
@@ -90,10 +100,10 @@ class pullUpListener(JavaParserLabeledListener):
         if self.__current_class_or_interface is None:
             return
 
-        method_signature = f"{ctx.IDENTIFIER().getText()} {ctx.formalParameters().getText()}" # signature without considering return value
-        # method_signature = f"{ctx.typeTypeOrVoid().getText()} {ctx.IDENTIFIER().getText()} {ctx.formalParameters().getText()}" # signature considering return value
-        
+        parameters = ",".join(self.__parameter_names)
+        method_signature = f"{ctx.IDENTIFIER().getText()} ({parameters})"
         self.__methods_of_classes[self.__current_class_or_interface].append(method_signature)
+        self.__parameter_names = []
 
     def get_pullups(self, file_name):
         """
