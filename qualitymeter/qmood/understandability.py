@@ -148,7 +148,7 @@ class Understandability(WalkerCreator):
             polymorphic = 0
             if cls:
                 for clmt in cls.methods:
-                    if "private" not in clmt.modifiers and "final" not in clmt.modifiers and "static" not in clmt.modifier:
+                    if "private" not in clmt.modifiers and "final" not in clmt.modifiers and "static" not in clmt.modifiers:
                         polymorphic += 1
                 polymorphic_methods.append(polymorphic)
 
