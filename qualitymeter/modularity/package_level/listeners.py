@@ -65,7 +65,7 @@ class OutputListener(JavaParserLabeledListener):
     def enterImportDeclaration(self, ctx: JavaParserLabeled.ImportDeclarationContext):
         identifier = ctx.qualifiedName().getText()
         if "." in identifier:
-            identifier = identifier.split(".")[0]
+            identifier = identifier[:identifier.rfind(".")]
 
         self.__imported_packages[self.__current_package].add(f"package{identifier};")
 
