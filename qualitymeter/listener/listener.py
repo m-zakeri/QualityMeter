@@ -7,6 +7,7 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLab
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from qualitymeter.java_components.java_class import JavaClass
 from qualitymeter.java_components.java_interface import JavaInterface
+from qualitymeter.java_components.java_method_parameter import JavaMethodParameter
 
 
 class Listener(JavaParserLabeledListener):
@@ -14,6 +15,7 @@ class Listener(JavaParserLabeledListener):
     def __init__(self):
         self.__classes = []
         self.__interfaces = []
+        self.__currentPackage = None
         self.__currentClass = None
         self.__currentInterface = None
         self.__currentMethod = None
@@ -32,6 +34,12 @@ class Listener(JavaParserLabeledListener):
     def interfaces(self):
         return self.__interfaces
 
+    def enterCompilationUnit(self, ctx: JavaParserLabeled.CompilationUnitContext):
+        package = ""
+        for pack in ctx.packageDeclaration().qualifiedName().IDENTIFIER():
+            package += "{0}.".format(pack)
+        self.__currentPackage = package[:-1]
+
     def enterClassDeclaration(self, ctx: JavaParserLabeled.ClassDeclarationContext):
         """
         enterClassDeclaration.
@@ -40,12 +48,13 @@ class Listener(JavaParserLabeledListener):
         :return:
         """
         if self.__currentClass is not None:
-            temp = JavaClass(ctx.IDENTIFIER())
+            temp = JavaClass(ctx.IDENTIFIER(), self.__currentPackage)
             temp.outer_class = self.__currentClass
             self.__currentClass = temp
         else:
             # Create class and store in current class object.
-            self.__currentClass = JavaClass(ctx.IDENTIFIER())
+            self.__currentClass = JavaClass(
+                ctx.IDENTIFIER(), self.__currentPackage)
 
         # Here we aim to calculate the Number of Hierarchies or (NoH) metric: mapped to Hierarchy Property.
         if ctx.EXTENDS():
@@ -80,7 +89,8 @@ class Listener(JavaParserLabeledListener):
                 for varDec in field_dec.variableDeclarators().variableDeclarator():
                     for i in ctx.modifier():
                         if i.classOrInterfaceModifier():
-                            self.__currentAttributesModifiers.append(i.classOrInterfaceModifier().getText())
+                            self.__currentAttributesModifiers.append(
+                                i.classOrInterfaceModifier().getText())
                     self.__currentClass.add_attribute(field_dec.typeType().getText(),
                                                       varDec.variableDeclaratorId().IDENTIFIER(),
                                                       self.__currentAttributesModifiers)
@@ -88,15 +98,19 @@ class Listener(JavaParserLabeledListener):
             elif isinstance(ctx.memberDeclaration(), JavaParserLabeled.MemberDeclaration0Context):
                 for i in ctx.modifier():
                     if i.classOrInterfaceModifier():
-                        self.__currentMethodModifiers.append(i.classOrInterfaceModifier().getText())
+                        self.__currentMethodModifiers.append(
+                            i.classOrInterfaceModifier().getText())
                         if ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList():
                             if isinstance(
-                                    ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
+                                    ctx.memberDeclaration().methodDeclaration(
+                                    ).formalParameters().formalParameterList(),
                                     JavaParserLabeled.FormalParameterList0Context):
                                 for p in ctx.memberDeclaration().methodDeclaration(). \
                                         formalParameters().formalParameterList().formalParameter():
-                                    self.__currentMethodParametersType.append(p.typeType().getText())
-                                    self.__currentMethodParameters.append(p.variableDeclaratorId().IDENTIFIER())
+                                    self.__currentMethodParametersType.append(
+                                        p.typeType().getText())
+                                    self.__currentMethodParameters.append(JavaMethodParameter(
+                                        p.variableDeclaratorId().IDENTIFIER(), p.typeType().getText()))
                             # if isinstance(
                             #         ctx.memberDeclaration().methodDeclaration().formalParameters().formalParameterList(),
                             #         JavaParserLabeled.FormalParameterList1Context):
@@ -142,7 +156,8 @@ class Listener(JavaParserLabeledListener):
             self.__currentMethodVariables.append(ctx.IDENTIFIER().getText())
 
     def enterInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
-        self.__currentInterface = JavaInterface(ctx.IDENTIFIER())
+        self.__currentInterface = JavaInterface(
+            ctx.IDENTIFIER(), self.__currentPackage)
 
     def enterInterfaceMethodDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
         if self.__currentInterface:
@@ -151,3 +166,6 @@ class Listener(JavaParserLabeledListener):
     def exitInterfaceDeclaration(self, ctx: JavaParserLabeled.InterfaceMethodDeclarationContext):
         self.__interfaces.append(self.__currentInterface)
         self.__currentInterface = None
+
+    def exitCompilationUnit(self, ctx: JavaParserLabeled.CompilationUnitContext):
+        self.__currentPackage = None

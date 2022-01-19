@@ -50,3 +50,9 @@ coverage.xml
 docs/_build/
 docs/
 test/
+
+# idea
+.idea
+
+#outout
+./output/*
