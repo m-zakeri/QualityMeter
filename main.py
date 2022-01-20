@@ -5,6 +5,16 @@ from qualitymeter.refactoring_opportunities.pushdown_method_identification impor
 from utils.file_reader import FileReader
 from qualitymeter.qmood.understandability import Understandability
 from qualitymeter.qmood.extendibility import Extendability
+from qualitymeter.qmood.functionality import Functionality
+
+
+def analyze_functionality(project_path):
+    streams = FileReader.get_file_streams(project_path)
+    functionality = Functionality(streams).get_value()
+
+    print('compiler result : ')
+
+    print(f'Functionality = {functionality}')
 
 
 def analyze_undrestandibility(project_path):
@@ -17,7 +27,7 @@ def analyze_undrestandibility(project_path):
 
     # calculating understandability
     understandability, coupling, cohesion, design_size, abstraction, \
-        encapsulation, polymorphism, complexity = Understandability(project_path).get_value()
+    encapsulation, polymorphism, complexity = Understandability(project_path).get_value()
 
     # make the table of results to be printed
     table = [["understandability", understandability], ["coupling", coupling], ["cohesion", cohesion],
@@ -37,6 +47,7 @@ def analyze_extendability(project_path):
     extendability_meter = Extendability(project_path)
     extendability_meter.display_result()
 
+
 def detect_push_down_method(project_path, heuristic, output_name):
     DetectPushDownMethod(project_path, heuristic, output_name)
 
@@ -48,10 +59,21 @@ def main(arguments):
         analyze_undrestandibility(arguments.path)
     if arguments.extendability:
         analyze_extendability(arguments.path)
+    if arguments.functionality:
+        analyze_functionality(arguments.path)
 
 
 # Taking the arguments from user and starting the program
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--path',
+        help='path for project', default="C:\\Users\\Zahra\\Desktop\\Uni\\jvlt-1.3.2")
+    args = parser.parse_args()
+    if not args.path:
+        parser.print_help()
+        sys.exit(1)
+    main(args)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--path',
@@ -71,6 +93,10 @@ if __name__ == "__main__":
     parser.add_argument(
         '--extendability',
         help="give this argument to calculate the extendability of the project."
+    )
+    parser.add_argument(
+        '--functionality',
+        help="give this argument to calculate the functionality of the project."
     )
     args = parser.parse_args()
     if not args.path:
