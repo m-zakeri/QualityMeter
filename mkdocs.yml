@@ -8,8 +8,18 @@ copyright: © 2021-2022 QualityMeter project
 theme:
   name: material
   palette:
-    scheme: preference
-    primary: pink
+    - scheme: default
+      primary: lime
+      accent: pink
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: lime
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
   icon:
     logo: material/library
   features:
