@@ -16,6 +16,7 @@ class Listener(JavaParserLabeledListener):
         self.__classes = []
         self.__interfaces = []
         self.__currentPackage = None
+        self.__hierarchies = []
         self.__currentClass = None
         self.__currentInterface = None
         self.__currentMethod = None
@@ -29,6 +30,10 @@ class Listener(JavaParserLabeledListener):
     @property
     def classes(self):
         return self.__classes
+
+    @property
+    def hierarchies(self):
+        return self.__hierarchies
 
     @property
     def interfaces(self):
@@ -47,6 +52,8 @@ class Listener(JavaParserLabeledListener):
         :param ctx:
         :return:
         """
+        if ctx.EXTENDS() or ctx.IMPLEMENTS():
+            self.hierarchies.append(ctx.IDENTIFIER())
         if self.__currentClass is not None:
             temp = JavaClass(ctx.IDENTIFIER(), self.__currentPackage)
             temp.outer_class = self.__currentClass
