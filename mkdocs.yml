@@ -1,0 +1,44 @@
+site_name: QualityMeter Docs (v0.2.0)
+site_url: https://m-zakeri.github.io/QualityMeter
+repo_url: https://github.com/m-zakeri/QualityMeter
+site_description: Software design and source code quality measurements toolkit
+site_author: Morteza Zakeri-Nasrabadi
+copyright: © 2021-2022 QualityMeter project
+
+theme:
+  name: material
+  palette:
+    scheme: preference
+    primary: pink
+  icon:
+    logo: material/library
+  features:
+    - header.autohide
+  extra:
+    social:
+      - icon: fontawesome/brands/linkedin
+        link: https://www.linkedin.com/in/mortazazakeri/
+
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - import os
+          selection:
+            members: True
+
+nav:
+    - Home: index.md
+    - Metrics: metrics.md
+    - Benchmarks: benchmarks.md
+    - Datasets: datasets.md
+    - Modules:
+        - Main: modules/core.md
+    - Publications: publications.md
+    - Related projects: related_projects.md
+    - Issue Tracker: 'https://github.com/m-zakeri/QualityMeter/issues'
+
