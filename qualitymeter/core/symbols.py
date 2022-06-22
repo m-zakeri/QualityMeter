@@ -1,6 +1,6 @@
 """
 Class MyListener -> here we extract all the design metrics needed to calculate
-    design listener like
+    design core like
 """
 
 from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLabeledListener
@@ -10,7 +10,7 @@ from qualitymeter.java_components.java_interface import JavaInterface
 from qualitymeter.java_components.java_method_parameter import JavaMethodParameter
 
 
-class Listener(JavaParserLabeledListener):
+class ProgramSymbolModel(JavaParserLabeledListener):
 
     def __init__(self):
         self.__classes = []
