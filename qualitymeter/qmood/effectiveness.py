@@ -78,9 +78,9 @@ def _parse_files(file_list):
         stream = CommonTokenStream(lexer)
         parser = JavaParserLabeled(stream)
         tree = parser.compilationUnit()
-        # Initiate a custom listener
+        # Initiate a custom core
         extractor = InfoExtractorListener()
-        # Walk the tree using listener
+        # Walk the tree using core
         walker.walk(extractor, tree)
         # Update globals
         __userDefined.update(extractor.return_user_defined())

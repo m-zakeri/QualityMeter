@@ -16,7 +16,7 @@ def listener(args):
     # Step 5: Create parse tree
     parse_tree = parser.compilationUnit()
 
-    # Step 6: Create an instance of listener
+    # Step 6: Create an instance of core
     my_listener1 = MoveFieldRefactoring()
 
     # Step 7: Create an instance of walker

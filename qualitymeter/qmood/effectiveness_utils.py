@@ -7,7 +7,7 @@ from qualitymeter.gen.javaLabeled.JavaParserLabeledListener import JavaParserLab
 
 class InfoExtractorListener(JavaParserLabeledListener):
     """
-    A custom listener based on ANTLR generated one, to extract necessary information about classes.
+    A custom core based on ANTLR generated one, to extract necessary information about classes.
     """
 
     def __init__(self):

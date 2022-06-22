@@ -9,7 +9,7 @@ T_REPORT = Tuple[str, int, bool, bool, List[Tuple[str, int, bool, int]]]
 
 class InfoExtractorListener(JavaParserLabeledListener):
     """
-    A custom listener based on ANTLR generated one, to extract necessary information about classes.
+    A custom core based on ANTLR generated one, to extract necessary information about classes.
     """
 
     def __init__(self):

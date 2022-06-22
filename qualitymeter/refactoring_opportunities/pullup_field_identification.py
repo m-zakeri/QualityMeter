@@ -171,9 +171,9 @@ def _parse_files(file_list: List[str]):
         except Exception as e:
             __logger.error(f'File "{file}" is broken', exc_info=True)
             continue
-        # Initiate a custom listener
+        # Initiate a custom core
         extractor = InfoExtractorListener()
-        # Walk the tree using listener
+        # Walk the tree using core
         walker.walk(extractor, tree)
         # Update globals
         for item in extractor.return_indexed_classes():
