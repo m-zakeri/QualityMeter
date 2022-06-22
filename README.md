@@ -1,5 +1,7 @@
 # QualityMeter
 
+![Quality meter log](docs/figs/quality-meter.png)
+
 ### Software quality meter toolkit
 
 QualityMeter is a tool to compute various design quality attributes for object-oriented programs. 
