@@ -12,7 +12,7 @@ theme:
       primary: lime
       accent: pink
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/weather-night
         name: Switch to dark mode
     - scheme: slate
       primary: lime
