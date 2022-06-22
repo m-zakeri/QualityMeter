@@ -5,7 +5,7 @@ functionality = 0.12 * Cohesion + 0.22 * Polymorphism + 0.22 * Messaging +
 
 """
 
-from qualitymeter.java_components.walker import WalkerCreator
+from qualitymeter.utils.walker_creator import WalkerCreator
 
 
 class Functionality(WalkerCreator):
