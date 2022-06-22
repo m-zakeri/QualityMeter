@@ -26,6 +26,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://m-zakeri.github.io/QualityMeter/related_projects/</loc>
+         <lastmod>2022-06-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://m-zakeri.github.io/QualityMeter/modules/core/</loc>
          <lastmod>2022-06-22</lastmod>
          <changefreq>daily</changefreq>
