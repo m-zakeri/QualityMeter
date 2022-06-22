@@ -2,7 +2,7 @@ import argparse
 import sys
 from tabulate import tabulate
 from qualitymeter.refactoring_opportunities.pushdown_method_identification import DetectPushDownMethod
-from utils.file_reader import FileReader
+from qualitymeter.utils.file_reader import FileReader
 from qualitymeter.qmood.understandability import Understandability
 from qualitymeter.qmood.extendibility import Extendability
 from qualitymeter.qmood.functionality import Functionality

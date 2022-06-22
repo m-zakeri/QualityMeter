@@ -1,5 +1,5 @@
 from antlr4 import *
-from utils.file_reader import FileReader
+from qualitymeter.utils.file_reader import FileReader
 from qualitymeter.gen.javaLabeled.JavaLexer import JavaLexer
 from qualitymeter.gen.javaLabeled.JavaParserLabeled import JavaParserLabeled
 from .coupling_listener import CouplingListener
